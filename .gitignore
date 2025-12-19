@@ -11,3 +11,5 @@ yarn-error.log*
 /.idea/
 .vscode/
 *.local
+# Local Netlify folder
+.netlify
