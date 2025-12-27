@@ -81,8 +81,13 @@
             transition: var(--transition);
             border: none;
             text-transform: uppercase;
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             letter-spacing: 1px;
+            min-width: 100px;
+            min-height: 44px; /* Minimum touch target size */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-primary {
@@ -115,6 +120,7 @@
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
             width: 100%;
             z-index: 1000;
             padding: 20px 0;
@@ -134,38 +140,147 @@
             align-items: center;
             padding: 0 20px;
             gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 72px; /* fixed nav height for consistent alignment */
+            box-sizing: border-box;
+            transform: none; /* Removed problematic shift */
+        }
+
+        /* Ensure we can position customer area relative to viewport so it's always visible */
+        #customerArea {
+            position: fixed;
+            right: 20px;
+            top: 20px; /* aligns with nav padding */
+            z-index: 1300;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
 
         /* Prevent logo/name wrapping and allow search to shrink correctly */
         .nav-container { flex-wrap: nowrap; }
-        .logo { flex: 0 0 auto; }
+        .logo { flex: 0 0 auto; display:flex; align-items:center; height:100%; }
+        .logo img { height: 72px; width: auto; }
         .logo span { display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px; }
-        .search-wrapper { flex: 1 1 420px; min-width: 0; }
-        .nav-links { flex: 0 0 auto; }
+        /* Search expands to fill available space but can shrink; min-width prevents collapse */
+        /* Ensure the icon and voice button don't overlap the input */
+        .search-wrapper { flex: 1 1 auto; min-width: 180px; max-width: 450px; display:flex; align-items:center; gap:8px; height:56px; position:relative; }
+        .search-wrapper .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#666; pointer-events:none; z-index:1; }
+        .search-wrapper input#siteSearch { width:100%; padding:10px 50px 10px 44px; border-radius:999px; border:1px solid rgba(0,0,0,0.08); background: #ffffff; color:#111; outline:none; font-size:1rem; }
+        #voiceBtn { position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:#666; padding:6px 8px; border-radius:999px; cursor:pointer; z-index:1; }
+        .nav-links { flex: 0 0 auto; display:flex; align-items:center; gap:14px; flex-wrap:nowrap; }
+        .nav-links > li { display:inline-flex; align-items:center; height:56px; flex:0 0 auto; }
+        /* allow nav-links to scroll horizontally if items exceed available space */
+        .nav-links { overflow-x:auto; -webkit-overflow-scrolling:touch; }
 
+        /* Customer area placed to the right of nav-links; ensure it is visible */
+        #customerArea { flex: 0 0 auto; color: #fff; font-weight: 700; }
+        /* Style for injected customer status list item */
+        .nav-links .customer-status { white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis; }
+
+        /* Better intermediate breakpoint for tablets */
+        @media (max-width: 900px) {
+            .nav-container { padding: 0 12px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 160px; }
+            .nav-links { gap: 10px; }
+            .nav-links a, .nav-links .admin-link, .nav-links .btn { font-size: 1rem; }
+        }
+
+        /* Laptop screens (1024px - 1200px) - Prevent navbar clashing */
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .nav-container { padding: 0 12px; gap: 8px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 160px; max-width: 350px; margin: 0 10px; }
+            .nav-links { gap: 8px; }
+            .nav-links a, .admin-link { font-size: 0.95rem; padding: 6px 10px; }
+            .btn { font-size: 0.95rem; padding: 6px 10px; }
+            .logo span { max-width: 180px; font-size: 1.3rem; }
+        }
+
+        /* Smallest laptop screens (1024px - 1100px) - Very aggressive spacing reduction */
+        @media (min-width: 769px) and (max-width: 1100px) {
+            .nav-container { padding: 0 10px; gap: 6px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 140px; max-width: 300px; margin: 0 8px; }
+            .nav-links { gap: 6px; }
+            .nav-links a { font-size: 0.9rem; padding: 6px 8px; }
+            .admin-link { font-size: 0.9rem; padding: 6px 8px; }
+            .btn { font-size: 0.9rem; padding: 6px 8px; }
+            /* Hide restaurant name to save space */
+            .logo span { display: none !important; }
+        }
+
+        /* Wide desktop screens - Optimize spacing */
+        @media (min-width: 1201px) {
+            .search-wrapper { max-width: 450px; }
+            .nav-links { gap: 18px; }
+        }
+
+        /* Tablet and small screens */
+        @media (max-width: 768px) {
+            .nav-container { padding: 0 12px; }
+            .logo img { height: 48px; width: auto; }
+            .search-wrapper { flex: 1 1 auto; min-width: 150px; max-width: none; margin: 0 8px; }
+            
+            /* Floating icons need more spacing */
+            .notif-icon { bottom: 190px; width: 46px; height: 46px; right: 16px; }
+            .chat-widget { bottom: 130px; width: 46px; height: 46px; right: 16px; }
+            .cart-icon { bottom: 30px; width: 54px; height: 54px; right: 16px; }
+            .notif-icon i, .chat-widget i { font-size: 1.1rem; }
+            .cart-icon i { font-size: 1.3rem; }
+            
+            /* Move bottom nav up to avoid cart icon */
+            .bottom-nav { bottom: 100px; padding: 8px 14px; }
+        }
+
+        /* Mobile screens */
         @media (max-width: 600px) {
+            .nav-container { padding: 0 10px; gap: 8px; }
             /* Allow the restaurant name to wrap and reduce logo image size so full name is visible */
             .logo img { height: 40px; width: auto; }
             /* Hide restaurant name on small screens to maximize space for search */
             .logo span { display: none !important; }
-            .search-wrapper { flex: 1 1 auto; max-width: none; }
+            .search-wrapper { flex: 1 1 auto; min-width: 140px; max-width: none; margin: 0 6px; }
+
+            /* On small screens hide full nav-links and show hamburger menu */
+            .nav-links { display: none; }
+            .hamburger { display: block; }
 
             /* Reposition floating icons to a tidy vertical stack on the right */
-            .notif-icon, .chat-widget, .cart-icon {
-                right: 12px;
-                box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-            }
-
-            .notif-icon { bottom: 150px; width:44px; height:44px; }
-            .chat-widget { bottom: 100px; width:44px; height:44px; }
-            .cart-icon { bottom: 30px; width:52px; height:52px; }
-
-            .notif-icon i, .chat-widget i, .cart-icon i { font-size:1.05rem; }
+            .notif-icon { bottom: 200px; width: 44px; height: 44px; right: 12px; }
+            .chat-widget { bottom: 135px; width: 44px; height: 44px; right: 12px; }
+            .cart-icon { bottom: 30px; width: 52px; height: 52px; right: 12px; }
+            .notif-icon i, .chat-widget i, .cart-icon i { font-size: 1.05rem; }
 
             /* Move the bottom action bar up so it doesn't overlap cart icon */
-            .bottom-nav { bottom: 78px; padding: 8px 12px; }
-            .bottom-nav .admin-link, .bottom-nav .btn-primary { padding: 6px 10px; font-size: 0.95rem; }
+            .bottom-nav { bottom: 105px; padding: 7px 10px; }
+            .bottom-nav .admin-link, .bottom-nav .btn-primary { padding: 6px 10px; font-size: 0.9rem; }
         }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .nav-container { padding: 0 8px; gap: 6px; }
+            .logo img { height: 36px; }
+            .search-wrapper { min-width: 120px; margin: 0 4px; }
+            #siteSearch { padding: 8px 42px 8px 38px; font-size: 0.9rem; }
+            .search-wrapper .search-icon { left: 10px; font-size: 0.9rem; }
+            #voiceBtn { width: 36px; height: 36px; right: 4px; }
+            #voiceBtn i { font-size: 0.9rem; }
+            
+            /* Extra spacing for very small screens */
+            .notif-icon { bottom: 210px; width: 42px; height: 42px; }
+            .chat-widget { bottom: 140px; width: 42px; height: 42px; }
+            .cart-icon { bottom: 25px; width: 50px; height: 50px; }
+            .bottom-nav { bottom: 110px; padding: 6px 8px; }
+            .bottom-nav .loyalty { padding: 5px 8px; font-size: 0.85rem; }
+        }
+
+        /* Ensure nav doesn't shift due to overflow; allow horizontal scrolling inside nav-links if needed */
+        .nav-container { overflow: visible; }
+        .nav-links { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .nav-links::-webkit-scrollbar { height: 6px; }
+        .nav-links::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
         .logo {
             font-size: 2rem;
@@ -184,11 +299,11 @@
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 16px;
         }
 
         .nav-links a {
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             font-weight: 600;
             transition: var(--transition);
             position: relative;
@@ -212,7 +327,7 @@
             border-radius: 50px;
             border: none;
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             transition: var(--transition);
         }
 
@@ -1941,6 +2056,29 @@
             opacity: 1;
         }
 
+        /* Fullscreen admin modal variant */
+        .modal.admin-full {
+            align-items: stretch;
+        }
+
+        .modal.admin-full .modal-content {
+            width: 100%;
+            max-width: none;
+            height: 100%;
+            border-radius: 0;
+            padding: 28px;
+            box-shadow: none;
+            overflow-y: auto;
+        }
+
+        /* Admin panel layout inside fullscreen modal */
+        .admin-panel-header h2 { font-size: 1.6rem; }
+        .admin-grid .admin-left { }
+        .admin-grid .admin-right { }
+        .admin-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .admin-table tbody tr td { padding: 10px 8px; }
+        .admin-table thead th { padding: 10px 8px; }
+
         .modal-content {
             background: var(--dark-glass);
             padding: 40px;
@@ -2836,25 +2974,24 @@
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <style>
         /* Navbar search — in-input microphone + left icon */
-        .search-wrapper{ position: relative; display:flex; align-items:center; flex:1 1 420px; max-width:520px; margin:0 16px; }
-        .search-wrapper .search-icon{ position: absolute; left:14px; color:rgba(30,39,46,0.35); font-size:1rem; pointer-events:none; }
-        #siteSearch{ width:100%; padding:10px 48px 10px 42px; border-radius:28px; border:1px solid rgba(0,0,0,0.06); font-size:0.95rem; background:linear-gradient(180deg, #fff, #fbfbfb); box-shadow:0 6px 18px rgba(16,24,40,0.04); transition:box-shadow .18s, border-color .18s; }
-        #siteSearch::placeholder{ color: #9aa3ab; }
-        #siteSearch:focus{ outline:none; box-shadow:0 10px 30px rgba(16,24,40,0.06); border-color:var(--primary); }
-        #voiceBtn{ position:absolute; right:8px; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; border:none; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:var(--dark); cursor:pointer; box-shadow:none; }
-        #voiceBtn i{ transform:translateY(1px); color:var(--dark) !important; font-size:1rem; }
-        /* listening state kept as visual indicator */
-        #voiceBtn.listening{ background:linear-gradient(180deg,#b71c1c,#c62828); color:#fff; box-shadow:0 10px 30px rgba(198,40,40,0.18); transform:translateY(-50%) scale(1.03); }
-        @media (max-width:900px){
-            .search-wrapper{ display:flex; flex:1 1 auto; max-width: none; margin:0 8px; }
-            #siteSearch{ padding:8px 42px 8px 40px; border-radius:24px; font-size:0.95rem; }
-            .nav-container { padding: 0 12px; }
-            /* Floating icons: stack and size for mobile/tablet */
-            .notif-icon { right: 16px; bottom: 150px; width:44px; height:44px; }
-            .chat-widget { right: 16px; bottom: 100px; width:44px; height:44px; }
-            .cart-icon { right: 16px; bottom: 30px; width:52px; height:52px; }
-            .notif-icon i, .chat-widget i, .cart-icon i { font-size: 1.05rem; }
-            .cart-badge { right: -6px; top: -6px; min-width: 20px; height:20px; font-size:0.75rem; }
+        /* These styles override the earlier definitions for better specificity */
+        @media (min-width: 901px) {
+            .search-wrapper { margin: 0 16px; }
+        }
+        
+        @media (max-width: 900px) {
+            .search-wrapper { margin: 0 8px; }
+            #siteSearch { padding: 8px 46px 8px 38px; border-radius: 24px; font-size: 0.95rem; }
+        }
+        
+        @media (max-width: 600px) {
+            .search-wrapper { margin: 0 6px; }
+            #siteSearch { padding: 8px 42px 8px 36px; font-size: 0.9rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .search-wrapper { margin: 0 4px; }
+            #siteSearch { padding: 8px 40px 8px 34px; font-size: 0.85rem; }
         }
     </style>
     
@@ -2954,9 +3091,11 @@
                 <li><a href="#menu">Menu</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><button class="btn btn-outline" onclick="openCustomerModal()">Sign In</button></li>
                 <li><button class="admin-link" onclick="openAdminPanel()">Admin</button></li>
                 <li><button class="btn btn-primary" onclick="openModal()">Book Table</button></li>
             </ul>
+            <div id="customerArea" style="margin-left:12px; display:flex; align-items:center; gap:8px; white-space:nowrap;"></div>
             <div class="hamburger" id="hamburger">
                 <i class="fas fa-bars"></i>
             </div>
@@ -3399,7 +3538,7 @@
     <footer style="padding-bottom: 80px;">
         <div class="container">
             <div class="footer-logo">REHAN'S Multi Cuisine Restaurants</div>
-            <p class="dev-credit">Developed by <strong>Syed Mohathaseem</strong> <span class="heart">❤️</span></p>
+            <p class="dev-credit">Developed by <a href="https://syedmohathaseem.tech" target="_blank" rel="noopener noreferrer">syedmohathaseem.tech</a> <span class="heart">❤️</span></p>
             <div class="social-links">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
                 <a href="#"><i class="fab fa-instagram"></i></a>
@@ -3491,7 +3630,7 @@
 
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content">
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             
             <!-- Login Form -->
@@ -3518,43 +3657,130 @@
             </div>
             
             <!-- Admin Panel -->
-            <div id="adminPanel" class="admin-panel" style="display: none; background: var(--dark); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 16px; padding: 32px 24px;">
-                <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Admin Panel - Booking Analytics</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3>Total Bookings: <span id="totalBookings" style="color: var(--primary); font-weight: bold;">0</span></h3>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <button onclick="addSampleBooking()" class="btn btn-primary" style="margin-right: 10px;">Add Sample Booking</button>
-                    <button onclick="clearAllBookings()" class="btn btn-outline" style="background: #dc3545; color: white; border: none;">Clear All</button>
-                    <button onclick="logoutAdmin()" class="btn btn-outline" style="background: #6c757d; color: white; border: none; margin-left: 10px;">Logout</button>
-                </div>
-                
-                <div style="overflow-x: auto; border-radius: 12px; background: var(--dark-glass); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 0; background: transparent; border-radius: 12px; overflow: hidden;">
-                    <thead>
-                        <tr>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; border-right: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 2;">Name</th>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; border-right: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 2;">Email</th>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; border-right: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 2;">Date</th>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; border-right: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 2;">Time</th>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; border-right: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 2;">Guests</th>
-                            <th style="background: var(--primary); color: var(--dark); font-weight: 700; padding: 12px 10px; position: sticky; top: 0; z-index: 2;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bookingsTable">
-                        <!-- Bookings will be populated here -->
-                    </tbody>
-                </table>
+            <div id="adminPanel" class="admin-panel" style="display: none; background: var(--dark); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 16px; padding: 20px;">
+                <header class="admin-panel-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <h2 style="color:var(--primary);margin:0;font-size:1.6rem;">Admin Panel</h2>
+                        <span id="adminBadge" style="color:#ccc;font-size:0.95rem;">Booking & Menu Management</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input id="adminSearch" class="form-control" placeholder="Search bookings or menu" style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);color:#fff;min-width:220px;">
+                        <button onclick="addSampleBooking()" class="btn btn-primary">Add Sample</button>
+                        <button onclick="logoutAdmin()" class="btn btn-outline" style="background:#6c757d;color:white;border:none;">Logout</button>
+                        <button onclick="closeAdminModal()" class="btn btn-outline" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.08);">Close</button>
+                    </div>
+                </header>
+
+                <div class="admin-grid" style="display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;">
+                    <section class="admin-left" style="background:var(--dark-glass);padding:16px;border-radius:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <h3 style="margin:0;color:var(--primary);">Bookings <span id="totalBookings" style="color:var(--primary);font-weight:700;margin-left:8px;">0</span></h3>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn btn-outline" onclick="clearAllBookings()" style="background:#dc3545;color:white;border:none;">Clear All</button>
+                            </div>
+                        </div>
+
+                        <div style="max-height:60vh;overflow:auto;border-radius:8px;">
+                            <table class="admin-table" style="width:100%;border-collapse:collapse;color:#fff;">
+                                <thead>
+                                    <tr style="background:rgba(212,175,55,0.12);position:sticky;top:0;">
+                                        <th style="padding:10px 8px;text-align:left;">Name</th>
+                                        <th style="padding:10px 8px;text-align:left;">Date</th>
+                                        <th style="padding:10px 8px;text-align:left;">Time</th>
+                                        <th style="padding:10px 8px;text-align:right;">Guests</th>
+                                        <th style="padding:10px 8px;text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTable">
+                                    <!-- Bookings populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <aside class="admin-right" style="background:var(--dark-glass);padding:16px;border-radius:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <h3 style="margin:0;color:var(--primary);">Menu Management</h3>
+                            <button class="btn btn-primary" onclick="openEditMenuModal(null)">Add Item</button>
+                        </div>
+
+                        <div id="adminMenuList" style="display:flex;flex-direction:column;gap:10px;max-height:66vh;overflow:auto;padding-right:4px;">
+                            <!-- Admin menu items render here -->
+                        </div>
+                    </aside>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Edit / Add Menu Item Modal (Admin only) -->
+    
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content" style="max-width:520px;">
+            <span class="close-modal" onclick="closeCustomerModal()">&times;</span>
+            <div id="customerLoginView" style="display:block;">
+                <h2 style="text-align:center; color:var(--primary); margin-bottom:12px;">Customer Sign In</h2>
+                <form id="customerLoginForm">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="customerEmail" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="customerPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Sign In</button>
+                </form>
+                <p style="text-align:center; margin-top:10px;">Don't have an account? <a href="#" onclick="showCustomerSignup();return false;">Create one</a></p>
+            </div>
+
+            <div id="customerSignupView" style="display:none;">
+                <h2 style="text-align:center; color:var(--primary); margin-bottom:12px;">Customer Sign Up</h2>
+                <form id="customerSignupForm">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="signupName" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="signupEmail" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+                </form>
+                <p style="text-align:center; margin-top:10px;">Already have an account? <a href="#" onclick="showCustomerLogin();return false;">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="editMenuModal" class="modal">
+        <div class="modal-content" style="max-width:520px;">
+            <span class="close-modal" onclick="closeEditMenuModal()">&times;</span>
+            <h2 id="editModalTitle" style="text-align:center; color:var(--primary); margin-bottom:12px;">Edit Menu Item</h2>
+            <form id="editMenuForm">
+                <input type="hidden" id="editItemId">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editName" placeholder="Item Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editPrice" placeholder="Price (e.g. ₹499)" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editCategory" placeholder="Category (veg, non-veg, dessert, drinks)" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editImg" placeholder="Image URL (optional)">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="editDesc" rows="3" placeholder="Description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Save Item</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // --- DATA ---
-        const menuItems = [
+        let menuItems = [
             { id: 1, name: "Truffle Mushroom Pasta", price: "₹10", category: "veg", img: "https://images.unsplash.com/photo-1626844131082-256783844137?q=80&w=1935&auto=format&fit=crop", desc: "Creamy truffle sauce, wild mushrooms, parmesan." },
             { id: 2, name: "Grilled Salmon", price: "₹1,999", category: "non-veg", img: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", desc: "Fresh atlantic salmon, asparagus, lemon butter." },
             { id: 3, name: "Classic Steak", price: "₹2,499", category: "non-veg", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2070&auto=format&fit=crop", desc: "Ribeye cooked to perfection with garlic herbs." },
@@ -4453,7 +4679,11 @@
         }
 
         function closeAdminModal() {
-            document.getElementById('adminModal').classList.remove('show');
+            const modal = document.getElementById('adminModal');
+            modal.classList.remove('show');
+            modal.classList.remove('admin-full');
+            // restore page scroll
+            document.body.style.overflow = '';
             // Reset to login form when modal is closed
             setTimeout(() => {
                 isAdminLoggedIn = false;
@@ -4467,10 +4697,138 @@
         }
 
         function showAdminPanel() {
+            const modal = document.getElementById('adminModal');
+            modal.classList.add('show','admin-full');
+            // prevent background scrolling while admin panel is open
+            document.body.style.overflow = 'hidden';
             document.getElementById('adminLogin').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             updateBookingsDisplay();
+            // render admin menu manager
+            try { renderAdminMenuList(); } catch(e){}
         }
+
+        // --- Customer Auth (local) ---
+        let isCustomerLoggedIn = false;
+
+        function openCustomerModal() {
+            const modal = document.getElementById('customerModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            showCustomerLogin();
+        }
+
+        function closeCustomerModal() {
+            const modal = document.getElementById('customerModal');
+            if(modal) { modal.classList.remove('show'); }
+            document.body.style.overflow = '';
+        }
+
+        function showCustomerLogin() {
+            document.getElementById('customerLoginView').style.display = 'block';
+            document.getElementById('customerSignupView').style.display = 'none';
+        }
+
+        function showCustomerSignup() {
+            document.getElementById('customerLoginView').style.display = 'none';
+            document.getElementById('customerSignupView').style.display = 'block';
+        }
+
+        function loadCustomers() {
+            try { return JSON.parse(localStorage.getItem('customers')||'[]'); } catch(e){ return []; }
+        }
+
+        function saveCustomers(list) { localStorage.setItem('customers', JSON.stringify(list)); }
+
+        function handleCustomerSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
+            const customers = loadCustomers();
+            if(customers.find(c=>c.email===email)){
+                alert('Account with this email already exists');
+                return;
+            }
+            const customer = { id: Date.now(), name, email, password };
+            customers.push(customer);
+            saveCustomers(customers);
+            localStorage.setItem('currentCustomer', JSON.stringify(customer));
+            isCustomerLoggedIn = true;
+            updateCustomerUI();
+            closeCustomerModal();
+            showNotification('✅ Account created and signed in');
+        }
+
+        function handleCustomerLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('customerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('customerPassword').value;
+            const customers = loadCustomers();
+            const user = customers.find(c=>c.email===email && c.password===password);
+            if(!user) { alert('Invalid credentials'); return; }
+            localStorage.setItem('currentCustomer', JSON.stringify(user));
+            isCustomerLoggedIn = true;
+            updateCustomerUI();
+            closeCustomerModal();
+            showNotification('✅ Signed in successfully');
+        }
+
+        function logoutCustomer() {
+            localStorage.removeItem('currentCustomer');
+            isCustomerLoggedIn = false;
+            updateCustomerUI();
+            showNotification('👋 Signed out');
+        }
+
+        function updateCustomerUI() {
+            const current = JSON.parse(localStorage.getItem('currentCustomer')||'null');
+            const navLinks = document.querySelector('.nav-links');
+            if(!navLinks) return;
+            let existingLi = document.getElementById('customerStatus');
+            if(current) {
+                // Show full name in the dedicated customer area on the right side
+                const customerArea = document.getElementById('customerArea');
+                if(customerArea) {
+                    customerArea.innerHTML = `<span style="color:var(--primary);">Hi, ${escapeHtml(current.name)}</span><button onclick="logoutCustomer()" style="margin-left:8px;padding:6px 8px;border-radius:8px;border:none;cursor:pointer;background:#fff;color:var(--dark);font-weight:600;">Logout</button>`;
+                }
+                // hide Sign In button inside nav-links if present
+                const signInBtn = navLinks.querySelector('button[onclick="openCustomerModal()"]');
+                if(signInBtn && signInBtn.parentElement) { signInBtn.style.display = 'none'; }
+            } else {
+                // On logout, clear customerArea and restore Sign In button
+                const customerArea = document.getElementById('customerArea');
+                if(customerArea) customerArea.innerHTML = '';
+                const signInBtn = navLinks.querySelector('button[onclick="openCustomerModal()"]');
+                if(signInBtn) signInBtn.style.display = '';
+            }
+        }
+
+        // small helper to avoid XSS when injecting user name
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"'`=\/]/g, function(s) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    '/': '&#x2F;',
+                    '`': '&#x60;',
+                    '=': '&#x3D;'
+                })[s];
+            });
+        }
+
+        // Attach customer form handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById('customerSignupForm');
+            const loginForm = document.getElementById('customerLoginForm');
+            if(signupForm) signupForm.addEventListener('submit', handleCustomerSignup);
+            if(loginForm) loginForm.addEventListener('submit', handleCustomerLogin);
+            // initialize UI
+            updateCustomerUI();
+        });
 
         // Listen for bookings changes from other tabs/windows and update admin view
         window.addEventListener('storage', (e) => {
@@ -4490,6 +4848,10 @@
 
         function logoutAdmin() {
             isAdminLoggedIn = false;
+            // remove fullscreen and restore page scroll
+            const modal = document.getElementById('adminModal');
+            if(modal){ modal.classList.remove('admin-full'); }
+            document.body.style.overflow = '';
             showAdminLogin();
             showNotification('👋 Admin logged out successfully!');
         }
@@ -4611,6 +4973,7 @@
                 if (clientDataJSON.type === "webauthn.get") {
                     isAdminLoggedIn = true;
                     showAdminPanel();
+                    try { renderAdminMenuList(); } catch(e){}
                     showNotification('✅ Biometric login successful!');
                 } else {
                     throw new Error('Invalid authentication response');
@@ -4668,7 +5031,9 @@
             
             if (password === 'admin123') {
                 isAdminLoggedIn = true;
+                // show fullscreen admin panel and render manager
                 showAdminPanel();
+                try { renderAdminMenuList(); } catch(e){}
                 document.getElementById('adminPassword').value = '';
                 showNotification('✅ Admin login successful!');
             } else {
@@ -4978,6 +5343,124 @@
                     submitBtn.disabled = false;
                 }
             );
+        });
+
+        // --- Admin Menu Management (Admin-only) ---
+        (function(){
+            try{
+                const saved = localStorage.getItem('menuItems');
+                if (saved) menuItems = JSON.parse(saved);
+            }catch(e){console.warn('Could not load saved menu:', e)}
+        })();
+
+        function renderAdminMenuList(){
+            const el = document.getElementById('adminMenuList');
+            if(!el) return;
+            if(!isAdminLoggedIn){
+                el.innerHTML = '<p style="color:#ccc">Login to manage menu.</p>';
+                return;
+            }
+            if(!menuItems || menuItems.length === 0){ el.innerHTML = '<p style="color:#ccc">No menu items found.</p>'; return; }
+            el.innerHTML = '';
+            menuItems.forEach(item => {
+                const card = document.createElement('div');
+                card.style.display = 'flex';
+                card.style.justifyContent = 'space-between';
+                card.style.alignItems = 'center';
+                card.style.padding = '8px';
+                card.style.background = 'rgba(255,255,255,0.03)';
+                card.style.borderRadius = '8px';
+                card.style.marginBottom = '8px';
+                card.innerHTML = `
+                    <div style="display:flex;gap:12px;align-items:center;">
+                        <img src="${item.img || 'https://via.placeholder.com/64'}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
+                        <div>
+                            <div style="font-weight:700">${item.name}</div>
+                            <div style="color:#ccc;font-size:0.9rem">${item.category} • ${item.price}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" style="margin-right:8px" onclick="openEditMenuModal(${item.id})">Edit</button>
+                        <button class="btn btn-outline" style="background:#dc3545;color:white;border:none" onclick="deleteMenuItem(${item.id})">Delete</button>
+                    </div>
+                `;
+                el.appendChild(card);
+            });
+        }
+
+        function openEditMenuModal(id){
+            const modal = document.getElementById('editMenuModal');
+            const form = document.getElementById('editMenuForm');
+            form.reset();
+            document.getElementById('editItemId').value = id || '';
+            if(id){
+                const it = menuItems.find(m=>m.id === id);
+                if(it){
+                    document.getElementById('editName').value = it.name || '';
+                    document.getElementById('editPrice').value = it.price || '';
+                    document.getElementById('editCategory').value = it.category || '';
+                    document.getElementById('editImg').value = it.img || '';
+                    document.getElementById('editDesc').value = it.desc || '';
+                    document.getElementById('editModalTitle').textContent = 'Edit Menu Item';
+                }
+            } else {
+                document.getElementById('editModalTitle').textContent = 'Add Menu Item';
+            }
+            modal.classList.add('show');
+        }
+
+        function closeEditMenuModal(){
+            const modal = document.getElementById('editMenuModal');
+            if(modal) modal.classList.remove('show');
+        }
+
+        document.getElementById('editMenuForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const idVal = document.getElementById('editItemId').value;
+            const name = document.getElementById('editName').value.trim();
+            const price = document.getElementById('editPrice').value.trim();
+            const category = document.getElementById('editCategory').value.trim();
+            const img = document.getElementById('editImg').value.trim();
+            const desc = document.getElementById('editDesc').value.trim();
+
+            if(idVal){
+                const id = parseInt(idVal, 10);
+                const idx = menuItems.findIndex(m=>m.id === id);
+                if(idx > -1){
+                    menuItems[idx].name = name;
+                    menuItems[idx].price = price;
+                    menuItems[idx].category = category;
+                    menuItems[idx].img = img;
+                    menuItems[idx].desc = desc;
+                }
+            } else {
+                const newId = menuItems.length ? Math.max(...menuItems.map(m=>m.id)) + 1 : 1;
+                menuItems.push({ id: newId, name, price, category, img, desc });
+            }
+
+            localStorage.setItem('menuItems', JSON.stringify(menuItems));
+            renderAdminMenuList();
+            const activeBtn = document.querySelector('.filter-btn.active');
+            const filter = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+            loadMenu(filter);
+            closeEditMenuModal();
+            showNotification('✅ Menu updated');
+        });
+
+        function deleteMenuItem(id){
+            if(!confirm('Delete this menu item?')) return;
+            menuItems = menuItems.filter(m=>m.id !== id);
+            localStorage.setItem('menuItems', JSON.stringify(menuItems));
+            renderAdminMenuList();
+            const activeBtn = document.querySelector('.filter-btn.active');
+            const filter = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+            loadMenu(filter);
+            showNotification('🗑️ Item deleted');
+        }
+
+        // Ensure admin menu list shows on load
+        document.addEventListener('DOMContentLoaded', function(){
+            renderAdminMenuList();
         });
 
     </script>
