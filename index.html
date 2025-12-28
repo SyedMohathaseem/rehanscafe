@@ -4927,12 +4927,18 @@
             const savedCredential = localStorage.getItem('adminBiometricCredential');
             if (savedCredential) {
                 biometricCredential = JSON.parse(savedCredential);
-                document.getElementById('registerBtn').style.display = 'none';
-                document.getElementById('resetBtn').style.display = 'inline-block';
-                document.getElementById('fingerprintBtn').disabled = false;
+                const regBtn = document.getElementById('registerBtn');
+                const resBtn = document.getElementById('resetBtn');
+                const fpBtn = document.getElementById('fingerprintBtn');
+                
+                if(regBtn) regBtn.style.display = 'none';
+                if(resBtn) resBtn.style.display = 'inline-block';
+                if(fpBtn) fpBtn.disabled = false;
             } else {
-                document.getElementById('fingerprintBtn').disabled = true;
-                document.getElementById('resetBtn').style.display = 'none';
+                const fpBtn = document.getElementById('fingerprintBtn');
+                const resBtn = document.getElementById('resetBtn');
+                if(fpBtn) fpBtn.disabled = true;
+                if(resBtn) resBtn.style.display = 'none';
             }
         });
 
@@ -4942,26 +4948,32 @@
 
             try {
                 if (!window.PublicKeyCredential) {
-                    statusElement.textContent = '❌ Biometric authentication not supported in this browser';
-                    statusElement.style.color = '#dc3545';
-                    document.getElementById('registerBtn').disabled = true;
-                    document.getElementById('fingerprintBtn').disabled = true;
+                    if(statusElement) {
+                        statusElement.textContent = '❌ Biometric authentication not supported in this browser';
+                        statusElement.style.color = '#dc3545';
+                    }
+                    const regBtn = document.getElementById('registerBtn');
+                    const fpBtn = document.getElementById('fingerprintBtn');
+                    if(regBtn) regBtn.disabled = true;
+                    if(fpBtn) fpBtn.disabled = true;
                     return;
                 }
 
                 // Check if platform authenticator is available
                 const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
 
-                if (available) {
+                if (available && statusElement) {
                     statusElement.textContent = '✅ Biometric authentication available (Fingerprint/Face)';
                     statusElement.style.color = '#28a745';
-                } else {
+                } else if (statusElement) {
                     statusElement.textContent = '⚠️ No built-in biometric sensor detected';
                     statusElement.style.color = '#ffc107';
                 }
             } catch (error) {
-                statusElement.textContent = '❌ Error checking biometric support';
-                statusElement.style.color = '#dc3545';
+                if(statusElement) {
+                    statusElement.textContent = '❌ Error checking biometric support';
+                    statusElement.style.color = '#dc3545';
+                }
                 console.error('Biometric support check failed:', error);
             }
         }
@@ -5423,22 +5435,24 @@
 
         // Admin password login form handler
         const adminLoginForm = document.getElementById('adminLoginForm');
-        adminLoginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const password = document.getElementById('adminPassword').value;
-            
-            if (password === 'admin123') {
-                isAdminLoggedIn = true;
-                // show fullscreen admin panel and render manager
-                showAdminPanel();
-                try { renderAdminMenuList(); } catch(e){}
-                document.getElementById('adminPassword').value = '';
-                showNotification('✅ Admin login successful!');
-            } else {
-                showNotification('❌ Invalid password!');
-                document.getElementById('adminPassword').value = '';
-            }
-        });
+        if (adminLoginForm) {
+            adminLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('adminPassword').value;
+                
+                if (password === 'admin123') {
+                    isAdminLoggedIn = true;
+                    // show fullscreen admin panel and render manager
+                    showAdminPanel();
+                    try { renderAdminMenuList(); } catch(e){}
+                    document.getElementById('adminPassword').value = '';
+                    showNotification('✅ Admin login successful!');
+                } else {
+                    showNotification('❌ Invalid password!');
+                    document.getElementById('adminPassword').value = '';
+                }
+            });
+        }
 
         function addSampleBooking() {
             const sampleBookings = [
@@ -5516,7 +5530,10 @@
 
         function openModal() {
             modal.classList.add('show');
-            navLinks.classList.remove('active'); // Close mobile menu if open
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                navLinks.classList.remove('active'); // Close mobile menu if open
+            }
         }
 
         function closeModal() {
@@ -5622,122 +5639,126 @@
             }
         });
 
-        const reservationForm = document.getElementById('reservationForm');
-        reservationForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('bookingName').value;
-            const email = document.getElementById('bookingEmail').value;
-            const phone = document.getElementById('bookingPhone').value;
-            const date = document.getElementById('bookingDate').value;
-            const time = document.getElementById('bookingTime').value;
-            const guests = document.getElementById('bookingGuests').value;
-            const notes = document.getElementById('bookingNotes').value || 'None';
-            
-            // Format date for display
-            const formattedDate = new Date(date).toLocaleDateString('en-IN', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
-            // Show loading state
-            const submitBtn = reservationForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            // Save to Firebase Firestore
-            try {
-                if (window.firebaseReady) {
-                    const bookingData = {
-                        name: name,
-                        email: email,
+        document.addEventListener('DOMContentLoaded', () => {
+            const reservationForm = document.getElementById('reservationForm');
+            if (reservationForm) {
+                reservationForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('bookingName').value;
+                    const email = document.getElementById('bookingEmail').value;
+                    const phone = document.getElementById('bookingPhone').value;
+                    const date = document.getElementById('bookingDate').value;
+                    const time = document.getElementById('bookingTime').value;
+                    const guests = document.getElementById('bookingGuests').value;
+                    const notes = document.getElementById('bookingNotes').value || 'None';
+                    
+                    // Format date for display
+                    const formattedDate = new Date(date).toLocaleDateString('en-IN', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    // Show loading state
+                    const submitBtn = reservationForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Sending...';
+                    submitBtn.disabled = true;
+                    
+                    // Save to Firebase Firestore
+                    try {
+                        if (window.firebaseReady) {
+                            const bookingData = {
+                                name: name,
+                                email: email,
+                                phone: phone,
+                                date: date,
+                                formattedDate: formattedDate,
+                                time: time,
+                                guests: parseInt(guests),
+                                specialRequests: notes,
+                                status: 'pending',
+                                createdAt: window.firebaseTimestamp(),
+                                type: 'table_reservation'
+                            };
+                            
+                            const docRef = await window.firebaseAddDoc(
+                                window.firebaseCollection(window.firebaseDB, 'reservations'),
+                                bookingData
+                            );
+                            console.log('✅ Reservation saved to Firebase with ID:', docRef.id);
+                            
+                            // Save to localStorage for admin panel
+                            const localBookings = JSON.parse(localStorage.getItem('restaurantBookings')) || [];
+                            localBookings.push({
+                                id: Date.now(),
+                                name: name,
+                                email: email,
+                                date: date,
+                                time: time,
+                                guests: parseInt(guests),
+                                status: 'Confirmed'
+                            });
+                            localStorage.setItem('restaurantBookings', JSON.stringify(localBookings));
+                            // Update in-memory bookings and admin display so admin sees new booking immediately
+                            try {
+                                bookings = JSON.parse(localStorage.getItem('restaurantBookings')) || [];
+                                if (typeof updateBookingsDisplay === 'function') updateBookingsDisplay();
+                                try { incrementNotificationBadge(1); } catch(e){}
+                            } catch (e) { console.warn('Could not update admin bookings display:', e); }
+                            
+                        }
+                    } catch (firebaseError) {
+                        console.error('Firebase save error:', firebaseError);
+                    }
+                    
+                    // Template parameters for EmailJS
+                    const templateParams = {
+                        to_email: 'mohammedmohathaseem25@gmail.com',
+                        from_name: name,
+                        from_email: email,
                         phone: phone,
-                        date: date,
-                        formattedDate: formattedDate,
-                        time: time,
-                        guests: parseInt(guests),
-                        specialRequests: notes,
-                        status: 'pending',
-                        createdAt: window.firebaseTimestamp(),
-                        type: 'table_reservation'
+                        booking_date: formattedDate,
+                        booking_time: time,
+                        guests: guests,
+                        special_requests: notes,
+                        reply_to: email,
+                        message: `Table Reservation Request:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nDate: ${formattedDate}\nTime: ${time}\nGuests: ${guests}\nSpecial Requests: ${notes}`
                     };
                     
-                    const docRef = await window.firebaseAddDoc(
-                        window.firebaseCollection(window.firebaseDB, 'reservations'),
-                        bookingData
-                    );
-                    console.log('✅ Reservation saved to Firebase with ID:', docRef.id);
-                    
-                    // Save to localStorage for admin panel
-                    const localBookings = JSON.parse(localStorage.getItem('restaurantBookings')) || [];
-                    localBookings.push({
-                        id: Date.now(),
-                        name: name,
-                        email: email,
-                        date: date,
-                        time: time,
-                        guests: parseInt(guests),
-                        status: 'Confirmed'
-                    });
-                    localStorage.setItem('restaurantBookings', JSON.stringify(localBookings));
-                    // Update in-memory bookings and admin display so admin sees new booking immediately
-                    try {
-                        bookings = JSON.parse(localStorage.getItem('restaurantBookings')) || [];
-                        if (typeof updateBookingsDisplay === 'function') updateBookingsDisplay();
-                        try { incrementNotificationBadge(1); } catch(e){}
-                    } catch (e) { console.warn('Could not update admin bookings display:', e); }
-                    
-                }
-            } catch (firebaseError) {
-                console.error('Firebase save error:', firebaseError);
-            }
-            
-            // Template parameters for EmailJS
-            const templateParams = {
-                to_email: 'mohammedmohathaseem25@gmail.com',
-                from_name: name,
-                from_email: email,
-                phone: phone,
-                booking_date: formattedDate,
-                booking_time: time,
-                guests: guests,
-                special_requests: notes,
-                reply_to: email,
-                message: `Table Reservation Request:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nDate: ${formattedDate}\nTime: ${time}\nGuests: ${guests}\nSpecial Requests: ${notes}`
-            };
-            
-            // Send email using EmailJS (Safely)
-            if (typeof emailjs !== 'undefined') {
-                emailjs.send(
-                    'service_2x94jhf',
-                    'template_sy5295a',
-                    templateParams
-                )
-                .then(
-                    function(response) {
-                        console.log('Reservation sent!', response.status, response.text);
-                        // Success handled below
-                    },
-                    function(error) {
-                        console.warn('Email notification failed (but booking saved):', error);
+                    // Send email using EmailJS (Safely)
+                    if (typeof emailjs !== 'undefined') {
+                        emailjs.send(
+                            'service_2x94jhf',
+                            'template_sy5295a',
+                            templateParams
+                        )
+                        .then(
+                            function(response) {
+                                console.log('Reservation sent!', response.status, response.text);
+                                // Success handled below
+                            },
+                            function(error) {
+                                console.warn('Email notification failed (but booking saved):', error);
+                            }
+                        );
+                    } else {
+                        console.warn('EmailJS not loaded. Skipping email notification.');
                     }
-                );
-            } else {
-                console.warn('EmailJS not loaded. Skipping email notification.');
-            }
 
-            // Always show success to user if we reached here (Firestore save attempted)
-            showNotification(`✅ Booking Confirmed for ${formattedDate} at ${time}`);
-            showNotification(`📞 We will contact ${phone} if needed.`);
-            closeModal();
-            reservationForm.reset();
-            
-            // Reset button
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
+                    // Always show success to user if we reached here (Firestore save attempted)
+                    showNotification(`✅ Booking Confirmed for ${formattedDate} at ${time}`);
+                    showNotification(`📞 We will contact ${phone} if needed.`);
+                    closeModal();
+                    reservationForm.reset();
+                    
+                    // Reset button
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+            }
         });
 
         // --- Admin Menu Management (Admin-only) ---
@@ -6011,6 +6032,132 @@
         });
 
     </script>
+
+
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            margin: auto;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            transition: color 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-header p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+        
+        /* Fix for date/time inputs on dark bg */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+    </style>
 
     <!-- Custom Popup Modal -->
     <div class="popup-overlay" id="popupOverlay">
