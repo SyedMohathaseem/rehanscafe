@@ -138,28 +138,55 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 10px 0 5px;
             gap: 12px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             height: 72px; /* fixed nav height for consistent alignment */
             box-sizing: border-box;
             transform: none; /* Removed problematic shift */
         }
 
-        /* Ensure we can position customer area relative to viewport so it's always visible */
+        /* Customer area integrated into navbar flow */
         #customerArea {
-            position: fixed;
-            right: 20px;
-            top: 20px; /* aligns with nav padding */
-            z-index: 1300;
-            color: #fff;
+            flex: 0 1 auto;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             white-space: nowrap;
+            padding-left: 10px;
+            padding-right: 5px;
+            max-width: 250px;
         }
 
+        #customerArea span {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #customerArea button {
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        #customerArea button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Style for injected customer status list item */
         /* Prevent logo/name wrapping and allow search to shrink correctly */
         .nav-container { flex-wrap: nowrap; }
         .logo { flex: 0 0 auto; display:flex; align-items:center; height:100%; }
@@ -170,24 +197,19 @@
         .search-wrapper { flex: 1 1 auto; min-width: 180px; max-width: 450px; display:flex; align-items:center; gap:8px; height:56px; position:relative; }
         .search-wrapper .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#666; pointer-events:none; z-index:1; }
         .search-wrapper input#siteSearch { width:100%; padding:10px 50px 10px 44px; border-radius:999px; border:1px solid rgba(0,0,0,0.08); background: #ffffff; color:#111; outline:none; font-size:1rem; }
-        #voiceBtn { position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:#666; padding:6px 8px; border-radius:999px; cursor:pointer; z-index:1; }
+        #voiceBtn { position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:#666; padding:6px 8px; border-radius:999px; cursor:pointer; z-index:1; transition: all 0.3s ease; }
+        #voiceBtn:hover { background: rgba(0,0,0,0.05); }
+        #voiceBtn.listening { background: #ef4444; color: #ffffff; animation: pulse-red 1.5s ease-in-out infinite; }
+        
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+        
         .nav-links { flex: 0 0 auto; display:flex; align-items:center; gap:14px; flex-wrap:nowrap; }
         .nav-links > li { display:inline-flex; align-items:center; height:56px; flex:0 0 auto; }
         /* allow nav-links to scroll horizontally if items exceed available space */
         .nav-links { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-
-        /* Customer area placed to the right of nav-links; ensure it is visible */
-        #customerArea { flex: 0 0 auto; color: #fff; font-weight: 700; }
-        /* Style for injected customer status list item */
-        .nav-links .customer-status { white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis; }
-
-        /* Better intermediate breakpoint for tablets */
-        @media (max-width: 900px) {
-            .nav-container { padding: 0 12px; }
-            .search-wrapper { flex: 1 1 auto; min-width: 160px; }
-            .nav-links { gap: 10px; }
-            .nav-links a, .nav-links .admin-link, .nav-links .btn { font-size: 1rem; }
-        }
 
         /* Laptop screens (1024px - 1200px) - Prevent navbar clashing */
         @media (min-width: 769px) and (max-width: 1200px) {
@@ -219,9 +241,12 @@
 
         /* Tablet and small screens */
         @media (max-width: 768px) {
-            .nav-container { padding: 0 12px; }
+            .nav-container { padding: 0 8px; gap: 6px; }
             .logo img { height: 48px; width: auto; }
-            .search-wrapper { flex: 1 1 auto; min-width: 150px; max-width: none; margin: 0 8px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 120px; max-width: 280px; margin: 0 6px; }
+            #customerArea { max-width: 180px; padding-left: 6px; padding-right: 4px; }
+            #customerArea span { font-size: 0.8rem; max-width: 100px; }
+            #customerArea button { padding: 4px 8px; font-size: 0.75rem; }
             
             /* Floating icons need more spacing */
             .notif-icon { bottom: 190px; width: 46px; height: 46px; right: 16px; }
@@ -236,12 +261,15 @@
 
         /* Mobile screens */
         @media (max-width: 600px) {
-            .nav-container { padding: 0 10px; gap: 8px; }
+            .nav-container { padding: 0 6px; gap: 4px; }
             /* Allow the restaurant name to wrap and reduce logo image size so full name is visible */
             .logo img { height: 40px; width: auto; }
             /* Hide restaurant name on small screens to maximize space for search */
             .logo span { display: none !important; }
-            .search-wrapper { flex: 1 1 auto; min-width: 140px; max-width: none; margin: 0 6px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 100px; max-width: 200px; margin: 0 4px; }
+            #customerArea { max-width: 150px; gap: 4px; padding-left: 4px; padding-right: 2px; }
+            #customerArea span { font-size: 0.75rem; max-width: 80px; }
+            #customerArea button { padding: 4px 6px; font-size: 0.7rem; }
 
             /* On small screens hide full nav-links and show hamburger menu */
             .nav-links { display: none; }
@@ -258,7 +286,27 @@
             .bottom-nav .admin-link, .bottom-nav .btn-primary { padding: 6px 10px; font-size: 0.9rem; }
         }
 
-        /* Extra small screens */
+        /* Better intermediate breakpoint for tablets */
+        @media (max-width: 900px) {
+            .nav-container { padding: 0 12px; }
+            .search-wrapper { flex: 1 1 auto; min-width: 160px; }
+            .nav-links { gap: 10px; }
+            .nav-links a, .nav-links .admin-link, .nav-links .btn { font-size: 1rem; }
+            #customerArea span { font-size: 0.9rem; max-width: 140px; }
+            #customerArea button { padding: 5px 10px; font-size: 0.85rem; }
+        }
+
+        /* Laptop screens - Adjust customer area for space */
+        @media (min-width: 769px) and (max-width: 1200px) {
+            #customerArea span { max-width: 150px; font-size: 0.9rem; }
+            #customerArea button { padding: 5px 10px; font-size: 0.85rem; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1100px) {
+            #customerArea span { max-width: 120px; font-size: 0.85rem; }
+        }
+
+        /* Tablet and small screens */
         @media (max-width: 480px) {
             .nav-container { padding: 0 8px; gap: 6px; }
             .logo img { height: 36px; }
@@ -299,7 +347,7 @@
 
         .nav-links {
             display: flex;
-            gap: 16px;
+            gap: 7px;
         }
 
         .nav-links a {
@@ -2093,6 +2141,171 @@
 
         .modal.show .modal-content { transform: scale(1); }
 
+        /* Premium Login Modal Styles - Matching admin-login.html */
+        .premium-login-modal {
+            max-width: 450px !important;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUpLogin 0.6s ease-out;
+        }
+
+        @keyframes slideUpLogin {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        .login-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        .premium-form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .premium-form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .premium-form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .premium-form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .premium-form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .premium-login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            border: none;
+            border-radius: 12px;
+            color: #0f0f0f;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+            margin-top: 10px;
+        }
+
+        .premium-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.5);
+        }
+
+        .premium-login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .login-footer a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-footer a:hover {
+            color: #f3e5ab;
+        }
+
+        .credentials-info-customer {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .credentials-info-customer p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .credentials-info-customer .cred-text {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 3px 0;
+        }
+
         .close-modal {
             position: absolute;
             top: 15px;
@@ -2377,8 +2590,8 @@
             .chat-widget {
                 width: 48px;
                 height: 48px;
-                bottom: 120px;
-                right: 30px;
+                bottom: 100px;
+                right: 15px;
             }
             
             .chat-widget i {
@@ -2737,8 +2950,8 @@
             .chat-widget {
                 width: 48px;
                 height: 48px;
-                bottom: 120px;
-                right: 30px;
+                bottom: 110px;
+                right: 10px;
             }
             
             .chat-widget i {
@@ -2985,20 +3198,44 @@
         }
         
         @media (max-width: 600px) {
-            .search-wrapper { margin: 0 6px; }
-            #siteSearch { padding: 8px 42px 8px 36px; font-size: 0.9rem; }
+            .search-wrapper { 
+                margin: 0 6px; 
+                width: 100%;
+                order: 10;
+            }
+            #siteSearch { 
+                padding: 8px 42px 8px 36px; 
+                font-size: 0.9rem;
+                width: 100%;
+            }
+            /* Make navigation wrap on mobile */
+            .bottom-nav-bar, header, nav, .nav-container {
+                flex-wrap: wrap !important;
+            }
         }
         
         @media (max-width: 480px) {
-            .search-wrapper { margin: 0 4px; }
-            #siteSearch { padding: 8px 40px 8px 34px; font-size: 0.85rem; }
+            .search-wrapper { 
+                margin: 0 4px; 
+                width: 100%;
+                order: 10;
+            }
+            #siteSearch { 
+                padding: 8px 40px 8px 34px; 
+                font-size: 0.85rem;
+                width: 100%;
+            }
+            /* Make navigation wrap on mobile */
+            .bottom-nav-bar, header, nav, .nav-container {
+                flex-wrap: wrap !important;
+            }
         }
     </style>
     
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, setDoc, doc, getDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
         // Your Firebase configuration (provided by user)
         const firebaseConfig = {
@@ -3018,10 +3255,16 @@
         window.firebaseDB = db;
         window.firebaseCollection = collection;
         window.firebaseAddDoc = addDoc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseDoc = doc;
+        window.firebaseGetDoc = getDoc;
+        window.firebaseQuery = query;
+        window.firebaseWhere = where;
+        window.firebaseGetDocs = getDocs;
         window.firebaseTimestamp = serverTimestamp;
         window.firebaseReady = true;
         
-        console.log('🔥 Firebase initialized successfully!');
+        console.log('🔥 Firebase initialized successfully (Firestore Only)!');
     </script>
     
     <!-- EmailJS SDK -->
@@ -3041,11 +3284,6 @@
         <div class="cart-badge" id="cartBadge">0</div>
     </div>
 
-    <!-- Notification Bell -->
-    <div class="notif-icon" id="notifIcon" onclick="openAdminPanel(); clearNotificationBadge();" title="Notifications">
-        <i class="fas fa-bell"></i>
-        <div class="notif-badge" id="notifBadge" style="display:none;">0</div>
-    </div>
     <!-- Live Chat Widget -->
     <div class="chat-widget" onclick="openWhatsAppChat()">
         <i class="fab fa-whatsapp"></i>
@@ -3092,26 +3330,25 @@
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li><button class="btn btn-outline" onclick="openCustomerModal()">Sign In</button></li>
-                <li><button class="admin-link" onclick="openAdminPanel()">Admin</button></li>
                 <li><button class="btn btn-primary" onclick="openModal()">Book Table</button></li>
             </ul>
-            <div id="customerArea" style="margin-left:12px; display:flex; align-items:center; gap:8px; white-space:nowrap;"></div>
+            <div id="customerArea"></div>
             <div class="hamburger" id="hamburger">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
 
-    <!-- Bottom fixed bar: Loyalty points + Admin / Book actions -->
+    <!-- Bottom fixed bar: Book Table action -->
     <div class="bottom-nav" id="bottomNav">
-        <button class="admin-link" onclick="openAdminPanel()">Admin</button>
         <button class="btn btn-primary" onclick="openModal()">Book Table</button>
     </div>
+
 
     <section id="home">
         <div class="container hero-content">
             <h4>Welcome to the Experience</h4>
-            <h1>Taste the <span class="highlight">Extraordinary</span></h1>
+            <h1>Good Food Is <span class="highlight">Good Mood</span></h1>
             <p>Discover bold flavors, creative dishes, and a vibrant dining vibe — made for food lovers, dreamers, and explorers.</p>
             <a href="#menu" class="btn btn-primary">View Menu</a>
             <a href="#contact" class="btn btn-outline" style="margin-left: 10px;">Contact Us</a>
@@ -3629,125 +3866,66 @@
     </div>
 
     <!-- Admin Panel Modal -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeAdminModal()">&times;</span>
-            
-            <!-- Login Form -->
-            <div id="adminLogin" style="display: block;">
-                <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Admin Login</h2>
-                
-                <!-- Password Login -->
-                <div style="margin-bottom: 20px;">
-                    <h3 style="margin-bottom: 10px; color: #333;">Password Login</h3>
-                    <form id="adminLoginForm">
-                        <div class="form-group">
-                            <input type="password" class="form-control" id="adminPassword" placeholder="Enter Admin Password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Login with Password</button>
-                    </form>
-                </div>
-                
-                
-                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9em;">Default password: admin123</p>
-                <p style="text-align: center; color: #666; font-size: 0.8em;">First register your fingerprint, then use it to login</p>
-                <div id="biometricStatus" style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #28a745;">
-                    🔍 Checking biometric support...
-                </div>
-            </div>
-            
-            <!-- Admin Panel -->
-            <div id="adminPanel" class="admin-panel" style="display: none; background: var(--dark); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 16px; padding: 20px;">
-                <header class="admin-panel-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <h2 style="color:var(--primary);margin:0;font-size:1.6rem;">Admin Panel</h2>
-                        <span id="adminBadge" style="color:#ccc;font-size:0.95rem;">Booking & Menu Management</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <input id="adminSearch" class="form-control" placeholder="Search bookings or menu" style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);color:#fff;min-width:220px;">
-                        <button onclick="addSampleBooking()" class="btn btn-primary">Add Sample</button>
-                        <button onclick="logoutAdmin()" class="btn btn-outline" style="background:#6c757d;color:white;border:none;">Logout</button>
-                        <button onclick="closeAdminModal()" class="btn btn-outline" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.08);">Close</button>
-                    </div>
-                </header>
-
-                <div class="admin-grid" style="display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;">
-                    <section class="admin-left" style="background:var(--dark-glass);padding:16px;border-radius:12px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <h3 style="margin:0;color:var(--primary);">Bookings <span id="totalBookings" style="color:var(--primary);font-weight:700;margin-left:8px;">0</span></h3>
-                            <div style="display:flex;gap:8px;">
-                                <button class="btn btn-outline" onclick="clearAllBookings()" style="background:#dc3545;color:white;border:none;">Clear All</button>
-                            </div>
-                        </div>
-
-                        <div style="max-height:60vh;overflow:auto;border-radius:8px;">
-                            <table class="admin-table" style="width:100%;border-collapse:collapse;color:#fff;">
-                                <thead>
-                                    <tr style="background:rgba(212,175,55,0.12);position:sticky;top:0;">
-                                        <th style="padding:10px 8px;text-align:left;">Name</th>
-                                        <th style="padding:10px 8px;text-align:left;">Date</th>
-                                        <th style="padding:10px 8px;text-align:left;">Time</th>
-                                        <th style="padding:10px 8px;text-align:right;">Guests</th>
-                                        <th style="padding:10px 8px;text-align:right;">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bookingsTable">
-                                    <!-- Bookings populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <aside class="admin-right" style="background:var(--dark-glass);padding:16px;border-radius:12px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <h3 style="margin:0;color:var(--primary);">Menu Management</h3>
-                            <button class="btn btn-primary" onclick="openEditMenuModal(null)">Add Item</button>
-                        </div>
-
-                        <div id="adminMenuList" style="display:flex;flex-direction:column;gap:10px;max-height:66vh;overflow:auto;padding-right:4px;">
-                            <!-- Admin menu items render here -->
-                        </div>
-                    </aside>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Edit / Add Menu Item Modal (Admin only) -->
     
     <!-- Customer Modal -->
     <div id="customerModal" class="modal">
-        <div class="modal-content" style="max-width:520px;">
+        <div class="modal-content premium-login-modal">
             <span class="close-modal" onclick="closeCustomerModal()">&times;</span>
+            
             <div id="customerLoginView" style="display:block;">
-                <h2 style="text-align:center; color:var(--primary); margin-bottom:12px;">Customer Sign In</h2>
+                <div class="login-header">
+                    <div class="login-icon">🍽️</div>
+                    <h2>REHAN'S</h2>
+                    <p class="login-subtitle">Sign In</p>
+                </div>
+                
                 <form id="customerLoginForm">
-                    <div class="form-group">
-                        <input type="email" class="form-control" id="customerEmail" placeholder="Email" required>
+                    <div class="premium-form-group">
+                        <label>Email</label>
+                        <input type="email" id="customerEmail" placeholder="Enter your email" required>
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="customerPassword" placeholder="Password" required>
+                    <div class="premium-form-group">
+                        <label>Password</label>
+                        <input type="password" id="customerPassword" placeholder="Enter password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Sign In</button>
+                    <button type="submit" class="premium-login-btn">Sign In</button>
                 </form>
-                <p style="text-align:center; margin-top:10px;">Don't have an account? <a href="#" onclick="showCustomerSignup();return false;">Create one</a></p>
+                
+                <div class="credentials-info-customer">
+                    <p>Test Credentials:</p>
+                    <div class="cred-text">Email: admin@gmail.com</div>
+                    <div class="cred-text">Password: admin123</div>
+                </div>
+                
+                <p class="login-footer">Don't have an account? <a href="#" onclick="showCustomerSignup();return false;">Create one</a></p>
             </div>
 
             <div id="customerSignupView" style="display:none;">
-                <h2 style="text-align:center; color:var(--primary); margin-bottom:12px;">Customer Sign Up</h2>
+                <div class="login-header">
+                    <div class="login-icon">🍽️</div>
+                    <h2>REHAN'S</h2>
+                    <p class="login-subtitle">Create Account</p>
+                </div>
+                
                 <form id="customerSignupForm">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="signupName" placeholder="Full Name" required>
+                    <div class="premium-form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your name" required>
                     </div>
-                    <div class="form-group">
-                        <input type="email" class="form-control" id="signupEmail" placeholder="Email" required>
+                    <div class="premium-form-group">
+                        <label>Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
+                    <div class="premium-form-group">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+                    <button type="submit" class="premium-login-btn">Create Account</button>
                 </form>
-                <p style="text-align:center; margin-top:10px;">Already have an account? <a href="#" onclick="showCustomerLogin();return false;">Sign in</a></p>
+                <p class="login-footer">Already have an account? <a href="#" onclick="showCustomerLogin();return false;">Sign in</a></p>
             </div>
         </div>
     </div>
@@ -3831,33 +4009,24 @@
         // --- WEATHER API FUNCTION ---
         async function fetchWeather() {
             try {
-                // Using Open-Meteo API (free, no API key required)
-                // First, get user's location
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(async (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        
-                        // Fetch weather data
-                        const weatherResponse = await fetch(
-                            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
-                        );
-                        const weatherData = await weatherResponse.json();
-                        
-                        // Fetch location name using reverse geocoding
-                        const locationResponse = await fetch(
-                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-                        );
-                        const locationData = await locationResponse.json();
-                        
-                        updateWeatherUI(weatherData, locationData);
-                    }, () => {
-                        // If geolocation fails, use default location (New York)
-                        fetchDefaultWeather();
-                    });
-                } else {
-                    fetchDefaultWeather();
-                }
+                // Use restaurant location in Pernambut instead of user's geolocation
+                // Pernambut coordinates: 12.9446°N, 78.7194°E
+                const lat = 12.9446;
+                const lon = 78.7194;
+                
+                // Fetch weather data for Pernambut
+                const weatherResponse = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+                );
+                const weatherData = await weatherResponse.json();
+                
+                // Use fixed location name for restaurant
+                const locationData = { 
+                    city: 'Pernambut',
+                    locality: 'Tamil Nadu'
+                };
+                
+                updateWeatherUI(weatherData, locationData);
             } catch (error) {
                 console.error('Weather fetch error:', error);
                 document.getElementById('temperature').textContent = 'Unable to fetch weather';
@@ -3866,16 +4035,16 @@
         }
 
         async function fetchDefaultWeather() {
-            // Default to New York coordinates
-            const lat = 40.7128;
-            const lon = -74.0060;
+            // Use Pernambut as default location
+            const lat = 12.9446;
+            const lon = 78.7194;
             
             const weatherResponse = await fetch(
                 `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
             );
             const weatherData = await weatherResponse.json();
             
-            updateWeatherUI(weatherData, { city: 'New York', locality: 'NY' });
+            updateWeatherUI(weatherData, { city: 'Pernambut', locality: 'Tamil Nadu' });
         }
 
         function updateWeatherUI(weatherData, locationData) {
@@ -3932,6 +4101,35 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadMenu('all');
             fetchWeather(); // Fetch weather on page load
+            loadMenuFromLocalStorage(); // Load menu from admin panel edits
+        });
+
+        // --- MENU SYNC FROM LOCALSTORAGE ---
+        function loadMenuFromLocalStorage() {
+            const savedMenu = localStorage.getItem('restaurantMenu');
+            if (savedMenu) {
+                try {
+                    menuItems = JSON.parse(savedMenu);
+                    console.log('✅ Menu loaded from localStorage:', menuItems.length, 'items');
+                    loadMenu('all'); // Re-render with new data
+                } catch (e) {
+                    console.error('Error loading menu from localStorage:', e);
+                }
+            }
+        }
+
+        // Listen for menu updates from admin panel
+        window.addEventListener('menuUpdated', () => {
+            console.log('Menu updated event received');
+            loadMenuFromLocalStorage();
+        });
+
+        // Also listen for storage changes from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'restaurantMenu') {
+                console.log('Menu updated in localStorage');
+                loadMenuFromLocalStorage();
+            }
         });
 
         // --- STICKY NAVBAR ---
@@ -3998,9 +4196,16 @@
         function renderMenuItems(items) {
             menuContainer.innerHTML = '';
             items.forEach(item => {
+                // Default fallback image for menu items
+                const fallbackImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60';
+                const itemImg = item.img || fallbackImg;
+                
                 const itemHTML = `
                     <div class="menu-item">
-                        <img src="${item.img}" alt="${item.name}" class="menu-img">
+                        <img src="${itemImg}" 
+                             alt="${item.name}" 
+                             class="menu-img"
+                             onerror="this.src='${fallbackImg}';this.onerror=null;">
                         <div class="menu-details">
                             <div class="menu-header">
                                 <span class="menu-title">${item.name}</span>
@@ -4086,62 +4291,115 @@
                 });
             } else {
                 const recognizer = new SpeechRecognition();
-                recognizer.lang = 'en-IN';
-                recognizer.interimResults = true;
-                recognizer.maxAlternatives = 1;
+                // Enhanced settings for better accuracy
+                recognizer.continuous = true; // Keep listening continuously
+                recognizer.interimResults = true; // Show real-time results
+                recognizer.maxAlternatives = 3; // Get multiple alternatives for better understanding
+                recognizer.lang = 'en-IN'; // Indian English
 
                 let interimText = '';
+                let isListening = false;
 
                 voiceBtn.addEventListener('click', () => {
-                    if (voiceBtn.classList.contains('listening')) {
+                    if (isListening) {
                         recognizer.stop();
+                        isListening = false;
+                        voiceBtn.classList.remove('listening');
+                        searchInput.placeholder = 'Search menu, dishes or price...';
                         return;
                     }
-                    interimText = '';
-                    searchInput.value = '';
-                    recognizer.start();
-                    voiceBtn.classList.add('listening');
+                    
+                    try {
+                        interimText = '';
+                        searchInput.value = '';
+                        searchInput.placeholder = '🎤 Listening... Speak now';
+                        recognizer.start();
+                        isListening = true;
+                        voiceBtn.classList.add('listening');
+                    } catch (e) {
+                        console.error('Recognition start error:', e);
+                        searchInput.placeholder = 'Search menu, dishes or price...';
+                    }
                 });
 
                 recognizer.addEventListener('result', (ev) => {
-                    const transcript = Array.from(ev.results).map(r => r[0].transcript).join('');
+                    // Get best result with improved accuracy
+                    const results = ev.results;
+                    let transcript = '';
+                    
+                    for (let i = 0; i < results.length; i++) {
+                        transcript += results[i][0].transcript;
+                    }
+                    
                     interimText = transcript;
-                    if (searchInput) searchInput.value = interimText;
-                    if (ev.results[0].isFinal) {
+                    // Show real-time transcript in search box
+                    if (searchInput) {
+                        searchInput.value = interimText;
+                        searchInput.placeholder = '🎤 Listening...';
+                    }
+                    
+                    if (ev.results[ev.results.length - 1].isFinal) {
                         const finalText = transcript.trim();
-                        // Run normal search
-                        searchMenu(finalText);
+                        console.log('🎤 Voice recognized:', finalText);
+                        
+                        // Run search with recognized text
+                        if (finalText.length > 0) {
+                            searchMenu(finalText);
+                        }
 
                         // Command parsing: look for "order" commands
                         try {
                             const text = finalText.toLowerCase();
-                            // examples: "order truffle pasta now", "order pasta", "i want to order truffle mushroom pasta"
-                            const orderMatch = text.match(/order\s+(?:now\s*)?(.*)/) || text.match(/i want to order\s+(.*)/);
+                            // Enhanced command recognition patterns
+                            const orderMatch = text.match(/(?:order|add|get|i want|give me)\s+(?:now\s*)?(.+?)(?:\s+(?:please|thanks|thank you))?$/i) 
+                                            || text.match(/i (?:want to|would like to) order\s+(.+)/i);
                             if (orderMatch && orderMatch[1]) {
-                                const itemPhrase = orderMatch[1].replace(/now|please|thanks|thank you/g, '').trim();
+                                const itemPhrase = orderMatch[1]
+                                    .replace(/\b(?:now|please|thanks|thank you|one|a|an|the)\b/gi, '')
+                                    .trim();
+                                    
                                 if (itemPhrase.length > 0) {
-                                    // try to find best matching menu item by name
-                                    const normalized = itemPhrase.replace(/[^a-z0-9 ]/g, '').trim();
+                                    // Improved fuzzy matching with scoring
+                                    const normalized = itemPhrase.toLowerCase().replace(/[^a-z0-9 ]/g, '');
                                     let found = null;
-                                    // prefer exact contains on name
-                                    for (const it of menuItems) {
-                                        if (it.name.toLowerCase().includes(normalized)) { found = it; break; }
-                                    }
-                                    // fallback: check description
-                                    if (!found) {
-                                        for (const it of menuItems) {
-                                            if (it.desc && it.desc.toLowerCase().includes(normalized)) { found = it; break; }
+                                    let bestMatch = 0;
+                                    
+                                    // Score-based matching for better accuracy
+                                    for (const item of menuItems) {
+                                        const itemName = item.name.toLowerCase();
+                                        const itemDesc = (item.desc || '').toLowerCase();
+                                        
+                                        let score = 0;
+                                        if (itemName === normalized) score = 100; // Exact match
+                                        else if (itemName.includes(normalized)) score = 80; // Contains phrase
+                                        else {
+                                            // Word-by-word matching
+                                            const words = normalized.split(' ');
+                                            const matchedWords = words.filter(w => 
+                                                itemName.includes(w) || itemDesc.includes(w)
+                                            );
+                                            score = (matchedWords.length / words.length) * 60;
+                                        }
+                                        
+                                        if (score > bestMatch) {
+                                            bestMatch = score;
+                                            found = item;
                                         }
                                     }
 
-                                    if (found) {
+                                    if (found && bestMatch > 40) {
                                         addToCart(found);
-                                        // open cart so user sees the item
+                                        showNotification(`✅ Added "${found.name}" to cart!`);
                                         try { toggleCart(); } catch(e){}
-                                        // increment admin notification so admin sees new order intent
                                         try { incrementNotificationBadge(1); } catch(e){}
+                                        
+                                        // Stop voice listening after adding to cart
+                                        recognizer.stop();
+                                        isListening = false;
+                                        voiceBtn.classList.remove('listening');
+                                        searchInput.placeholder = 'Search menu, dishes or price...';
                                     } else {
-                                        showNotification(`Could not find "${itemPhrase}" on the menu.`);
+                                        showNotification(`❌ Could not find "${itemPhrase}" on the menu.`);
                                     }
                                 }
                             }
@@ -4150,12 +4408,31 @@
                 });
 
                 recognizer.addEventListener('end', () => {
+                    isListening = false;
                     voiceBtn.classList.remove('listening');
+                    searchInput.placeholder = 'Search menu, dishes or price...';
                 });
 
                 recognizer.addEventListener('error', (err) => {
+                    isListening = false;
                     voiceBtn.classList.remove('listening');
-                    showNotification('Voice search error');
+                    searchInput.placeholder = 'Search menu, dishes or price...';
+                    
+                    console.error('Voice recognition error:', err.error);
+                    
+                    // User-friendly error messages
+                    const errorMessages = {
+                        'no-speech': 'No speech detected. Please try again.',
+                        'audio-capture': 'Microphone not accessible. Check permissions.',
+                        'not-allowed': 'Microphone permission denied.',
+                        'network': 'Network error. Check connection.',
+                        'aborted': 'Voice recognition stopped.'
+                    };
+                    
+                    const message = errorMessages[err.error] || 'Voice search error.';
+                    if (err.error !== 'aborted') {
+                        showNotification(message);
+                    }
                 });
             }
         }
@@ -4287,21 +4564,8 @@
             const finalTotal = total - discount;
             currentPaymentAmount = finalTotal;
             
-            // Show payment summary
-            let message = `🛒 Order Summary\n\nSubtotal: ₹${total.toLocaleString('en-IN')}`;
-            
-            if (discount > 0) {
-                message += `\nDiscount (20%): -₹${discount.toLocaleString('en-IN')}`;
-                message += `\n✨ Final Total: ₹${finalTotal.toLocaleString('en-IN')}`;
-            } else {
-                message += `\nTotal: ₹${finalTotal.toLocaleString('en-IN')}`;
-            }
-            
-            message += `\n\nProceed to payment?`;
-            
-            if (confirm(message)) {
-                openUpiModal(finalTotal);
-            }
+            // Show order summary in custom popup
+            showCheckoutConfirmation(total, discount, finalTotal);
         }
 
         function openUpiModal(amount) {
@@ -4335,7 +4599,7 @@
             navigator.clipboard.writeText(upiId).then(() => {
                 showNotification(`✅ UPI ID copied: ${upiId}`);
             }).catch(() => {
-                alert(`UPI ID: ${upiId}`);
+                showPopup('info', 'UPI ID', `UPI ID: ${upiId}`);
             });
         }
 
@@ -4369,7 +4633,7 @@
             closeUpiModal();
             
             const total = currentPaymentAmount;
-            const orderId = '#URB' + Date.now().toString().slice(-6);
+            const orderId = '#RC' + Date.now().toString().slice(-6);
             
             // Save order to Firebase Firestore
             try {
@@ -4400,11 +4664,35 @@
                 console.error('Firebase save error:', firebaseError);
             }
             
+            // Save order to localStorage for admin panel
+            try {
+                const orders = JSON.parse(localStorage.getItem('restaurantOrders') || '[]');
+                const orderData = {
+                    id: orderId,
+                    items: cart.map(item => ({
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    total: total,
+                    timestamp: Date.now(),
+                    date: new Date().toLocaleString('en-IN'),
+                    status: 'completed',
+                    paymentMethod: 'UPI'
+                };
+                orders.unshift(orderData);
+                localStorage.setItem('restaurantOrders', JSON.stringify(orders));
+                console.log('✅ Order saved to localStorage');
+            } catch (storageError) {
+                console.error('localStorage save error:', storageError);
+            }
+            
             showNotification(`🎉 Payment of ₹${total.toLocaleString('en-IN')} received!`);
             try { incrementNotificationBadge(1); } catch(e){}
             
             setTimeout(() => {
-                alert(`✅ Order Confirmed!\n\nPayment: ₹${total.toLocaleString('en-IN')}\n\nThank you for ordering from REHAN'S Multi Cuisine Restaurants!\n\nYour delicious food will be prepared and ready soon.\n\nOrder ID: ${orderId}`);
+                // Show custom payment confirmation popup
+                showPaymentConfirmation(total, orderId);
                 
                 // Award loyalty points
                 updateLoyaltyPoints(total);
@@ -4708,8 +4996,9 @@
             try { renderAdminMenuList(); } catch(e){}
         }
 
-        // --- Customer Auth (local) ---
+        // --- Customer Auth (Custom Firestore) ---
         let isCustomerLoggedIn = false;
+        let currentUserData = null;
 
         function openCustomerModal() {
             const modal = document.getElementById('customerModal');
@@ -4734,69 +5023,179 @@
             document.getElementById('customerSignupView').style.display = 'block';
         }
 
-        function loadCustomers() {
-            try { return JSON.parse(localStorage.getItem('customers')||'[]'); } catch(e){ return []; }
-        }
-
-        function saveCustomers(list) { localStorage.setItem('customers', JSON.stringify(list)); }
-
-        function handleCustomerSignup(e) {
+        // Custom Signup: Store directly to Firestore
+        async function handleCustomerSignup(e) {
             e.preventDefault();
             const name = document.getElementById('signupName').value.trim();
             const email = document.getElementById('signupEmail').value.trim().toLowerCase();
             const password = document.getElementById('signupPassword').value;
-            const customers = loadCustomers();
-            if(customers.find(c=>c.email===email)){
-                alert('Account with this email already exists');
+
+            console.log('🔍 Custom Signup attempt:', { name, email });
+
+            // Wait for Firebase
+            if (!window.firebaseReady) {
+                showPopup('error', 'Error', 'System not ready. Please refresh.');
                 return;
             }
-            const customer = { id: Date.now(), name, email, password };
-            customers.push(customer);
-            saveCustomers(customers);
-            localStorage.setItem('currentCustomer', JSON.stringify(customer));
-            isCustomerLoggedIn = true;
-            updateCustomerUI();
-            closeCustomerModal();
-            showNotification('✅ Account created and signed in');
+
+            try {
+                // 1. Check if email already exists in Firestore
+                const usersRef = window.firebaseCollection(window.firebaseDB, 'users');
+                const q = window.firebaseQuery(usersRef, window.firebaseWhere("email", "==", email));
+                const querySnapshot = await window.firebaseGetDocs(q);
+
+                if (!querySnapshot.empty) {
+                    showPopup('error', 'Signup Failed', 'An account with this email already exists.');
+                    return;
+                }
+
+                // 2. Create new user data
+                const userId = 'user_' + Date.now(); // Custom unique ID
+                const userData = {
+                    uid: userId,
+                    name: name,
+                    email: email,
+                    password: password, // Storing as requested (ensure security compliance in prod)
+                    createdAt: window.firebaseTimestamp(),
+                    lastLogin: window.firebaseTimestamp()
+                };
+
+                // 3. Save directly to Firestore 'users' collection
+                await window.firebaseSetDoc(
+                    window.firebaseDoc(window.firebaseDB, 'users', userId),
+                    userData
+                );
+
+                console.log('✅ User data saved to Firestore:', userId);
+
+                // 4. Set local session
+                currentUserData = { uid: userId, name: name, email: email };
+                isCustomerLoggedIn = true;
+                localStorage.setItem('currentCustomer', JSON.stringify(currentUserData));
+                
+                updateCustomerUI();
+                closeCustomerModal();
+                showNotification('✅ Account created successfully!');
+                
+            } catch (error) {
+                console.error('Signup Error:', error);
+                showPopup('error', 'Signup Failed', 'Could not save data. Check internet connection.');
+            }
         }
 
-        function handleCustomerLogin(e) {
+        // Custom Login: Check Firestore
+        async function handleCustomerLogin(e) {
             e.preventDefault();
             const email = document.getElementById('customerEmail').value.trim().toLowerCase();
             const password = document.getElementById('customerPassword').value;
-            const customers = loadCustomers();
-            const user = customers.find(c=>c.email===email && c.password===password);
-            if(!user) { alert('Invalid credentials'); return; }
-            localStorage.setItem('currentCustomer', JSON.stringify(user));
-            isCustomerLoggedIn = true;
-            updateCustomerUI();
-            closeCustomerModal();
-            showNotification('✅ Signed in successfully');
+            
+            // Checking Admin Login
+            if(email === 'admin@gmail.com' && password === 'admin123') {
+                closeCustomerModal();
+                showPopup('success', 'Admin Login Successful!', 'Welcome back, Admin. Redirecting...');
+                setTimeout(() => {
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminUsername', 'admin');
+                    window.location.href = 'admin-panel.html';
+                }, 1500);
+                return;
+            }
+
+            if (!window.firebaseReady) {
+                showPopup('error', 'Error', 'System not ready. Please refresh.');
+                return;
+            }
+
+            try {
+                showNotification('🔄 Verifying credentials...');
+
+                // 1. Query Firestore for matching email AND password
+                // Note: Indexing might be required for compound queries if this grows
+                
+                // Simpler approach: Query by email first
+                const usersRef = window.firebaseCollection(window.firebaseDB, 'users');
+                const q = window.firebaseQuery(usersRef, window.firebaseWhere("email", "==", email));
+                const querySnapshot = await window.firebaseGetDocs(q);
+
+                if (querySnapshot.empty) {
+                    showPopup('error', 'Login Failed', 'No account found with this email.');
+                    return;
+                }
+
+                // 2. Check password matches
+                let userFound = null;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.password === password) {
+                        userFound = data;
+                    }
+                });
+
+                if (!userFound) {
+                    showPopup('error', 'Login Failed', 'Incorrect password.');
+                    return;
+                }
+
+                // 3. Login Success
+                currentUserData = {
+                    uid: userFound.uid,
+                    name: userFound.name,
+                    email: userFound.email
+                };
+                isCustomerLoggedIn = true;
+                localStorage.setItem('currentCustomer', JSON.stringify(currentUserData));
+
+                // Update last login
+                try {
+                     await window.firebaseSetDoc(
+                        window.firebaseDoc(window.firebaseDB, 'users', userFound.uid),
+                        { lastLogin: window.firebaseTimestamp() },
+                        { merge: true }
+                    );
+                } catch(e) { console.log('Login timestamp update skipped'); }
+
+                updateCustomerUI();
+                closeCustomerModal();
+                showNotification('✅ Signed in successfully');
+
+            } catch (error) {
+                console.error('Login Error:', error);
+                showPopup('error', 'Login Error', 'Something went wrong. Please try again.');
+            }
         }
 
+        // Logout
         function logoutCustomer() {
             localStorage.removeItem('currentCustomer');
+            currentUserData = null;
             isCustomerLoggedIn = false;
             updateCustomerUI();
             showNotification('👋 Signed out');
         }
 
         function updateCustomerUI() {
-            const current = JSON.parse(localStorage.getItem('currentCustomer')||'null');
             const navLinks = document.querySelector('.nav-links');
             if(!navLinks) return;
-            let existingLi = document.getElementById('customerStatus');
-            if(current) {
-                // Show full name in the dedicated customer area on the right side
+            
+            // Check local storage if memory is empty (page refresh case)
+            if(!currentUserData) {
+                try {
+                    const saved = localStorage.getItem('currentCustomer');
+                    if(saved) {
+                        currentUserData = JSON.parse(saved);
+                        isCustomerLoggedIn = true;
+                    }
+                } catch(e){}
+            }
+
+            if(currentUserData && isCustomerLoggedIn) {
                 const customerArea = document.getElementById('customerArea');
                 if(customerArea) {
-                    customerArea.innerHTML = `<span style="color:var(--primary);">Hi, ${escapeHtml(current.name)}</span><button onclick="logoutCustomer()" style="margin-left:8px;padding:6px 8px;border-radius:8px;border:none;cursor:pointer;background:#fff;color:var(--dark);font-weight:600;">Logout</button>`;
+                    customerArea.innerHTML = `<span>Hi, ${escapeHtml(currentUserData.name)}</span><button onclick="logoutCustomer()">Logout</button>`;
                 }
-                // hide Sign In button inside nav-links if present
                 const signInBtn = navLinks.querySelector('button[onclick="openCustomerModal()"]');
                 if(signInBtn && signInBtn.parentElement) { signInBtn.style.display = 'none'; }
             } else {
-                // On logout, clear customerArea and restore Sign In button
                 const customerArea = document.getElementById('customerArea');
                 if(customerArea) customerArea.innerHTML = '';
                 const signInBtn = navLinks.querySelector('button[onclick="openCustomerModal()"]');
@@ -4804,29 +5203,19 @@
             }
         }
 
-        // small helper to avoid XSS when injecting user name
         function escapeHtml(str) {
-            return String(str).replace(/[&<>"'`=\/]/g, function(s) {
-                return ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#39;',
-                    '/': '&#x2F;',
-                    '`': '&#x60;',
-                    '=': '&#x3D;'
-                })[s];
-            });
+            return String(str).replace(/[&<>"'`=\/]/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
+            })[s]);
         }
 
-        // Attach customer form handlers
         document.addEventListener('DOMContentLoaded', () => {
             const signupForm = document.getElementById('customerSignupForm');
             const loginForm = document.getElementById('customerLoginForm');
             if(signupForm) signupForm.addEventListener('submit', handleCustomerSignup);
             if(loginForm) loginForm.addEventListener('submit', handleCustomerLogin);
-            // initialize UI
+            
+            // Auto initialize UI from local storage
             updateCustomerUI();
         });
 
@@ -5205,13 +5594,13 @@
                         
                         // Check if EmailJS is configured
                         if (error.text && error.text.includes('publicKey')) {
-                            alert('⚠️ EmailJS not configured yet!\n\nPlease set up:\n1. Public Key\n2. Service ID\n3. Template ID\n\nSee console for details.');
+                            showPopup('warning', 'EmailJS Not Configured', 'EmailJS is not configured yet. Please set up Public Key, Service ID, and Template ID. See console for details.');
                             console.error('EmailJS Configuration Missing:', {
                                 message: 'You need to replace YOUR_PUBLIC_KEY, YOUR_SERVICE_ID, and YOUR_TEMPLATE_ID with your actual EmailJS credentials',
                                 getCredentials: 'Visit https://www.emailjs.com to get your credentials'
                             });
                         } else {
-                            alert(`❌ Error sending message: ${error.text || 'Unknown error'}\n\nPlease check your EmailJS configuration or try again later.`);
+                            showPopup('error', 'Message Send Failed', `Error sending message: ${error.text || 'Unknown error'}. Please check your EmailJS configuration or try again later.`);
                         }
                         
                         // Reset button
@@ -5220,7 +5609,7 @@
                     }
                 );
             } else {
-                alert('Please fill in all fields.');
+                showPopup('warning', 'Incomplete Form', 'Please fill in all required fields before submitting.');
             }
         });
 
@@ -5463,6 +5852,636 @@
             renderAdminMenuList();
         });
 
+        // --- CUSTOM POPUP SYSTEM ---
+        // Custom popup function to replace alert() calls
+        function showPopup(type, title, message) {
+            const overlay = document.getElementById('popupOverlay');
+            const modal = document.getElementById('popupModal');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+
+            // Set content
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            // Set type and icon
+            modal.className = 'popup-modal ' + type;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            icon.textContent = icons[type] || icons.info;
+
+            // Show popup
+            overlay.classList.add('active');
+        }
+
+        // Custom payment confirmation popup
+        function showPaymentConfirmation(total, orderId) {
+            const overlay = document.getElementById('popupOverlay');
+            const modal = document.getElementById('popupModal');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+
+            // Set content
+            titleEl.innerHTML = '🎉 Order Confirmed!';
+            messageEl.innerHTML = `
+                <div style="text-align: left; margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <span style="color: rgba(255,255,255,0.7);">Payment Amount:</span>
+                        <span style="color: #d4af37; font-weight: 700; font-size: 1.2rem;">₹${total.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: rgba(255,255,255,0.7);">Order ID:</span>
+                        <span style="color: #fff; font-weight: 600;">${orderId}</span>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 10px; border-left: 3px solid #d4af37;">
+                        <p style="color: rgba(255,255,255,0.9); margin: 0; line-height: 1.6;">
+                            Thank you for ordering from <strong style="color: #d4af37;">REHAN'S Multi Cuisine Restaurants</strong>! Your delicious food will be prepared and ready soon.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            // Set type and icon for payment confirmation
+            modal.className = 'popup-modal payment-success';
+            icon.innerHTML = '✓';
+
+            // Show popup
+            overlay.classList.add('active');
+        }
+
+        // Custom checkout confirmation popup
+        function showCheckoutConfirmation(subtotal, discount, finalTotal) {
+            const overlay = document.getElementById('popupOverlay');
+            const modal = document.getElementById('popupModal');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+
+            // Set content
+            titleEl.innerHTML = '🛒 Order Summary';
+            
+            let summaryHTML = `
+                <div style="text-align: left; margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <span style="color: rgba(255,255,255,0.7);">Subtotal:</span>
+                        <span style="color: #fff; font-weight: 600;">₹${subtotal.toLocaleString('en-IN')}</span>
+                    </div>`;
+            
+            if (discount > 0) {
+                summaryHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <span style="color: rgba(255,255,255,0.7);">Discount (20%):</span>
+                        <span style="color: #10b981; font-weight: 600;">-₹${discount.toLocaleString('en-IN')}</span>
+                    </div>`;
+            }
+            
+            summaryHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: rgba(255,255,255,0.9); font-size: 1.1rem; font-weight: 600;">Total:</span>
+                        <span style="color: #d4af37; font-weight: 700; font-size: 1.3rem;">₹${finalTotal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(212, 175, 55, 0.1); border-radius: 10px; border-left: 3px solid #d4af37;">
+                        <p style="color: rgba(255,255,255,0.9); margin: 0; line-height: 1.6; font-size: 0.95rem;">
+                            Proceed to payment?
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            messageEl.innerHTML = summaryHTML;
+
+            // Set type and icon for checkout confirmation
+            modal.className = 'popup-modal checkout-confirm';
+            icon.innerHTML = '🛒';
+
+            // Store amount for payment
+            modal.setAttribute('data-amount', finalTotal);
+
+            // Show popup with confirm buttons
+            overlay.classList.add('active');
+            showConfirmButtons();
+        }
+
+        function showConfirmButtons() {
+            const btnContainer = document.getElementById('popupButtons');
+            btnContainer.innerHTML = `
+                <button class="popup-btn popup-btn-cancel" onclick="closePopup()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="popup-btn popup-btn-confirm" onclick="confirmCheckout()">
+                    <i class="fas fa-check"></i> Proceed to Payment
+                </button>
+            `;
+        }
+
+        function confirmCheckout() {
+            const modal = document.getElementById('popupModal');
+            const amount = parseFloat(modal.getAttribute('data-amount'));
+            closePopup();
+            openUpiModal(amount);
+        }
+
+        function closePopup() {
+            const overlay = document.getElementById('popupOverlay');
+            overlay.classList.remove('active');
+            
+            // Reset to single OK button
+            const btnContainer = document.getElementById('popupButtons');
+            btnContainer.innerHTML = '<button class="popup-btn" onclick="closePopup()">OK</button>';
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('popupOverlay')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+    </script>
+
+    <!-- Custom Popup Modal -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-modal" id="popupModal">
+            <div class="popup-icon" id="popupIcon"></div>
+            <h2 class="popup-title" id="popupTitle"></h2>
+            <p class="popup-message" id="popupMessage"></p>
+            <div class="popup-buttons" id="popupButtons">
+                <button class="popup-btn" onclick="closePopup()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Custom Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-modal {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px 35px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            animation: popupSlide 0.3s ease-out;
+        }
+
+        .popup-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+        }
+
+        .popup-modal.success .popup-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .popup-modal.error .popup-icon {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        .popup-modal.warning .popup-icon {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+        }
+
+        .popup-modal.info .popup-icon {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .popup-message {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .popup-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            border: none;
+            border-radius: 10px;
+            color: #0f0f0f;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+            min-width: 100px;
+            max-width: 180px;
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.6);
+        }
+
+        .popup-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-btn-confirm {
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            color: #0f0f0f;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.5);
+        }
+
+        .popup-btn-confirm:hover {
+            background: linear-gradient(135deg, #f3e5ab, #d4af37);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.7);
+        }
+
+        /* Payment Success Popup Style */
+        .popup-modal.payment-success {
+            max-width: 500px;
+        }
+
+        .popup-modal.payment-success .popup-icon {
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5);
+            color: #0f0f0f;
+            font-weight: 900;
+            font-size: 2.5rem;
+        }
+
+        .popup-modal.payment-success .popup-title {
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .popup-modal {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+
+
+
+
+    <!-- FRESH NEW NOTIFICATION BELL ICON -->
+    <div class="notif-bell-icon" id="notifBellIcon" onclick="openNotifPanel()" title="Notifications" style="position:fixed;bottom:170px;right:25px;width:50px;height:50px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:all 0.3s ease;z-index:1000;">
+        <i class="fas fa-bell" style="font-size:1.3rem;color:var(--dark);"></i>
+        <div class="notif-count" id="notifCount" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">0</div>
+    </div>
+    
+    <style>
+        @media (max-width: 768px) {
+            .notif-bell-icon {
+                bottom: 160px !important;
+                right: 15px !important;
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .notif-bell-icon i {
+                font-size: 1.2rem !important;
+            }
+            .notif-count {
+                min-width: 20px !important;
+                height: 20px !important;
+                font-size: 0.65rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .notif-bell-icon {
+                bottom: 165px !important;
+                right: 10px !important;
+                width: 46px !important;
+                height: 46px !important;
+            }
+        }
+    </style>
+
+    <!-- FRESH NEW NOTIFICATION PANEL -->
+    <div class="notif-panel" id="notifPanel" style="display:none;position:fixed;right:0;top:0;width:420px;height:100%;background:var(--dark-glass);backdrop-filter:blur(20px);box-shadow:-5px 0 30px rgba(0,0,0,0.5);z-index:1500;">
+        <div style="padding:25px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
+            <h2 style="margin:0;font-size:1.5rem;color:var(--primary);">🔔 Notifications</h2>
+            <span onclick="closeNotifPanel()" style="font-size:2rem;cursor:pointer;color:rgba(255,255,255,0.6);">&times;</span>
+        </div>
+        <div id="notifContent" style="flex:1;overflow-y:auto;padding:15px;height:calc(100% - 80px);">
+            <div style="text-align:center;padding:50px 20px;color:rgba(255,255,255,0.5);">
+                <i class="fas fa-bell-slash" style="font-size:3rem;opacity:0.3;"></i>
+                <p>No notifications yet</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BRAND NEW NOTIFICATION SYSTEM - FRESH START
+        let notifications = [];
+        
+        // Load notifications from localStorage
+        try {
+            const stored = localStorage.getItem('freshNotifications');
+            if (stored) notifications = JSON.parse(stored);
+        } catch(e) {}
+        
+        // Save notifications
+        function saveNotifs() {
+            localStorage.setItem('freshNotifications', JSON.stringify(notifications));
+        }
+        
+        // Add notification
+        function createNotif(type, title, message, details) {
+            notifications.unshift({
+                id: Date.now(),
+                type: type,
+                title: title,
+                message: message,
+                details: details || null,
+                time: Date.now(),
+                read: false
+            });
+            if (notifications.length > 30) notifications.length = 30;
+            saveNotifs();
+            updateBadge();
+            showNotifToast(title);
+        }
+        
+        // Show toast notification
+        function showNotifToast(text) {
+            const toast = document.createElement('div');
+            toast.textContent = text;
+            toast.style.cssText = 'position:fixed;bottom:240px;right:25px;background:var(--primary);color:var(--dark);padding:15px 20px;border-radius:10px;font-weight:600;z-index:2000;animation:slideIn 0.3s ease;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Update badge count
+        function updateBadge() {
+            const count = notifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notifCount');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        // Open panel
+        function openNotifPanel() {
+            document.getElementById('notifPanel').style.display = 'block';
+            renderNotifs();
+        }
+        
+        // Close panel
+        function closeNotifPanel() {
+            document.getElementById('notifPanel').style.display = 'none';
+        }
+        
+        // Delete notification
+        function deleteNotif(id, event) {
+            event.stopPropagation();
+            notifications = notifications.filter(n => n.id !== id);
+            saveNotifs();
+            updateBadge();
+            renderNotifs();
+        }
+        
+        // Render notifications
+        function renderNotifs() {
+            const container = document.getElementById('notifContent');
+            if (notifications.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:rgba(255,255,255,0.5);"><i class="fas fa-bell-slash" style="font-size:3rem;opacity:0.3;"></i><p>No notifications yet</p></div>';
+                return;
+            }
+            
+            const icons = {order: '🛒', booking: '📅', menu: '🍽️'};
+            container.innerHTML = notifications.map(n => {
+                const timeAgo = getTimeAgo(n.time);
+                const bgColor = n.read ? 'rgba(255,255,255,0.05)' : 'rgba(212,175,55,0.1)';
+                const borderColor = n.read ? 'var(--primary)' : '#fbbf24';
+                
+                let detailsHTML = '';
+                
+                // Show order items with images
+                if (n.type === 'order' && n.details && n.details.items) {
+                    detailsHTML = `
+                        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
+                            ${n.details.items.map(item => `
+                                <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;">
+                                    <img src="${item.image || 'https://via.placeholder.com/60'}" style="width:60px;height:60px;border-radius:6px;object-fit:cover;">
+                                    <div style="flex:1;">
+                                        <div style="font-weight:600;color:#fff;">${item.name}</div>
+                                        <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">₹${item.price} × ${item.quantity}</div>
+                                    </div>
+                                    <div style="color:var(--primary);font-weight:700;">₹${item.price * item.quantity}</div>
+                                </div>
+                            `).join('')}
+                            <div style="text-align:right;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
+                                <div style="font-size:1.1rem;font-weight:700;color:var(--primary);">Total: ₹${n.details.total || 0}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div onclick="markRead(${n.id})" style="background:${bgColor};border-left:4px solid ${borderColor};border-radius:10px;padding:15px;margin-bottom:12px;position:relative;transition:all 0.3s;">
+                        <button onclick="deleteNotif(${n.id}, event)" style="position:absolute;top:10px;right:10px;background:rgba(255,0,0,0.2);border:1px solid rgba(255,0,0,0.4);color:#ff6b6b;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,0,0,0.3)'" onmouseout="this.style.background='rgba(255,0,0,0.2)'">
+                            <i class="fas fa-times" style="font-size:0.9rem;"></i>
+                        </button>
+                        <div style="display:flex;gap:10px;cursor:pointer;">
+                            <div style="font-size:2rem;">${icons[n.type] || '🔔'}</div>
+                            <div style="flex:1;padding-right:30px;">
+                                <div style="font-weight:600;color:#fff;margin-bottom:5px;">${n.title}</div>
+                                <div style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:8px;">${n.message}</div>
+                                ${detailsHTML}
+                                <div style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:8px;">${timeAgo}</div>
+                            </div>
+                            ${!n.read ? '<div style="width:8px;height:8px;background:#fbbf24;border-radius:50%;margin-top:5px;"></div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Mark as read
+        function markRead(id) {
+            const notif = notifications.find(n => n.id === id);
+            if (notif) {
+                notif.read = true;
+                saveNotifs();
+                updateBadge();
+                renderNotifs();
+            }
+        }
+        
+        // Time ago helper
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+            return Math.floor(seconds / 86400) + 'd ago';
+        }
+        
+        
+        
+        // Monitor cart for orders
+        let lastCart = 0;
+        let savedCartItems = [];
+        setInterval(() => {
+            const cartBadge = document.getElementById('cartBadge');
+            if (cartBadge) {
+                const current = parseInt(cartBadge.textContent) || 0;
+                
+                // Save cart items when cart has items
+                if (current > 0) {
+                    try {
+                        // Try multiple localStorage keys
+                        const cartData = localStorage.getItem('cartItems') || 
+                                       localStorage.getItem('cart') || 
+                                       localStorage.getItem('Cart');
+                        
+                        if (cartData) {
+                            savedCartItems = JSON.parse(cartData);
+                            console.log('Cart saved:', savedCartItems);
+                        } else if (window.cart && Array.isArray(window.cart)) {
+                            savedCartItems = window.cart;
+                            console.log('Cart from window:', savedCartItems);
+                        }
+                    } catch(e) {
+                        console.error('Error saving cart:', e);
+                    }
+                }
+                
+                // Detect order placement (cart cleared)
+                if (current === 0 && lastCart > 0) {
+                    console.log('Order detected! Last cart:', lastCart, 'Saved items:', savedCartItems);
+                    
+                    if (savedCartItems.length > 0) {
+                        // Has cart details - create rich notification
+                        const total = savedCartItems.reduce((sum, item) => {
+                            const price = parseFloat(item.price) || 0;
+                            const qty = parseInt(item.quantity) || 1;
+                            return sum + (price * qty);
+                        }, 0);
+                        
+                        createNotif('order', 'Order Placed! 🛒', 
+                            `Your order for ${lastCart} items has been placed successfully.`,
+                            {
+                                items: savedCartItems.map(item => ({
+                                    name: item.name || item.title || 'Item',
+                                    price: parseFloat(item.price) || 0,
+                                    quantity: parseInt(item.quantity) || 1,
+                                    image: item.img || item.image || 'https://via.placeholder.com/60'
+                                })),
+                                total: total
+                            }
+                        );
+                    } else {
+                        // No cart details - create simple notification
+                        console.log('Creating simple notification');
+                        createNotif('order', 'Order Placed! 🛒', 
+                            `Your order for ${lastCart} items has been placed successfully.`);
+                    }
+                    savedCartItems = [];
+                }
+                lastCart = current;
+            }
+        }, 1000);
+        
+        // Monitor for booking success
+        const mutationObs = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                        const text = (node.textContent || '').toLowerCase();
+                        if ((text.includes('booking') || text.includes('reservation')) && 
+                            (text.includes('confirmed') || text.includes('success'))) {
+                            setTimeout(() => {
+                                createNotif('booking', 'Table Booked! 📅', 
+                                    'Your reservation has been confirmed.');
+                            }, 500);
+                        }
+                    }
+                });
+            });
+        });
+        mutationObs.observe(document.body, {childList: true, subtree: true});
+        
+        // Initialize
+        updateBadge();
     </script>
 </body>
 </html>

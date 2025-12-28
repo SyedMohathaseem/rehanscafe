@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - REHAN'S Multi Cuisine Restaurants</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0e0e 50%, #2a1810 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Header */
+        .admin-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b00, #ffa500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .header-title h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #ff6b00, #ffa500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-info {
+            text-align: right;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-role {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            padding: 10px 24px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 10px;
+            color: #ef4444;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-section h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        /* Management Cards */
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .management-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff6b00, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .card-content p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b00, #ffa500);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+        }
+
+        /* Notification Badges */
+        .notification-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-radius: 50%;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .notification-badge.hidden {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Custom Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-modal {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px 35px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            animation: popupSlide 0.3s ease-out;
+        }
+
+        .popup-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+        }
+
+        .popup-modal.success .popup-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .popup-modal.error .popup-icon {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        .popup-modal.warning .popup-icon {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+        }
+
+        .popup-modal.info .popup-icon {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .popup-message {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .popup-btn {
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #ff6b00, #ffa500);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(255, 107, 0, 0.3);
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(255, 107, 0, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .dashboard-container {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .management-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-left">
+            <div class="header-icon">🍽️</div>
+            <div class="header-title">
+                <h1>REHAN'S Admin</h1>
+                <p>Restaurant Management Dashboard</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="admin-info">
+                <div class="admin-name" id="adminName">Admin User</div>
+                <div class="admin-role">Administrator</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h2>Welcome back, <span id="welcomeName">Admin</span>! 👋</h2>
+            <p>Here's what's happening with your restaurant today.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value">142</div>
+                <div class="stat-label">Total Reservations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value">28</div>
+                <div class="stat-label">Today's Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">1,247</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value">4.8</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+        </div>
+
+        <!-- Management Cards -->
+        <div class="management-grid">
+            <div class="management-card" style="position: relative;">
+                <span id="bookingsBadge" class="notification-badge hidden">0</span>
+                <div class="card-header">
+                    <div class="card-icon">📅</div>
+                    <h3>Reservations</h3>
+                </div>
+                <div class="card-content">
+                    <p>Manage table reservations, view upcoming bookings, and handle customer requests.</p>
+                    <button class="action-btn" onclick="viewReservations()">View Reservations</button>
+                </div>
+            </div>
+
+            <div class="management-card" style="position: relative;">
+                <span id="ordersBadge" class="notification-badge hidden">0</span>
+                <div class="card-header">
+                    <div class="card-icon">🛒</div>
+                    <h3>Orders Management</h3>
+                </div>
+                <div class="card-content">
+                    <p>View all food orders placed by customers. Track order status and revenue.</p>
+                    <button class="action-btn" onclick="viewOrders()">View Orders</button>
+                </div>
+            </div>
+
+            <div class="management-card">
+                <div class="card-header">
+                    <div class="card-icon">🍽️</div>
+                    <h3>Menu Management</h3>
+                </div>
+                <div class="card-content">
+                    <p>Add new menu items, edit existing dishes, update prices and availability.</p>
+                    <button class="action-btn" onclick="openMenuManagement()">Manage Menu</button>
+                </div>
+            </div>
+
+            <div class="management-card">
+                <div class="card-header">
+                    <div class="card-icon">💬</div>
+                    <h3>Customer Reviews</h3>
+                </div>
+                <div class="card-content">
+                    <p>View and respond to customer reviews and feedback to improve service quality.</p>
+                    <button class="action-btn" onclick="showPopup('info', 'Reviews', 'Review management dashboard coming soon!')">View Reviews</button>
+                </div>
+            </div>
+
+            <div class="management-card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h3>Analytics</h3>
+                </div>
+                <div class="card-content">
+                    <p>Track restaurant performance, revenue, and customer trends with detailed analytics.</p>
+                    <button class="action-btn" onclick="showPopup('info', 'Analytics', 'Analytics dashboard will be available soon!')">View Analytics</button>
+                </div>
+            </div>
+
+            <div class="management-card">
+                <div class="card-header">
+                    <div class="card-icon">🏠</div>
+                    <h3>Main Website</h3>
+                </div>
+                <div class="card-content">
+                    <p>Go back to the main restaurant website to see the customer-facing interface.</p>
+                    <a href="index.html" class="action-btn">Visit Website</a>
+                </div>
+            </div>
+
+            <div class="management-card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Settings</h3>
+                </div>
+                <div class="card-content">
+                    <p>Configure restaurant settings, operating hours, and notification preferences.</p>
+                    <button class="action-btn" onclick="showPopup('info', 'Settings', 'Settings panel coming soon!')">Open Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-modal" id="popupModal">
+            <div class="popup-icon" id="popupIcon"></div>
+            <h2 class="popup-title" id="popupTitle"></h2>
+            <p class="popup-message" id="popupMessage"></p>
+            <button class="popup-btn" onclick="closePopup()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = 'admin-login.html';
+        }
+
+        // Set admin name
+        const adminUsername = sessionStorage.getItem('adminUsername') || 'Admin';
+        document.getElementById('adminName').textContent = adminUsername;
+        document.getElementById('welcomeName').textContent = adminUsername;
+
+        // Load real data from localStorage
+        function loadDashboardData() {
+            const orders = JSON.parse(localStorage.getItem('restaurantOrders') || '[]');
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            
+            // Calculate stats
+            const totalOrders = orders.length;
+            const totalBookings = bookings.length;
+            
+            // Today's orders (within last 24 hours)
+            const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+            const todaysOrders = orders.filter(o => o.timestamp > oneDayAgo).length;
+            
+            // Total revenue from orders
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            
+            // Update stats
+            document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value').textContent = totalOrders;
+            document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-label').textContent = 'Total Orders';
+            
+            document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-value').textContent = todaysOrders;
+            document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-label').textContent = "Today's Orders";
+            
+            document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value').textContent = totalBookings;
+            document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-label').textContent = 'Total Reservations';
+            
+            document.querySelector('.stats-grid .stat-card:nth-child(4) .stat-value').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+            document.querySelector('.stats-grid .stat-card:nth-child(4) .stat-label').textContent = 'Total Revenue';
+            
+            console.log('📊 Dashboard loaded:', { totalOrders, totalBookings, totalRevenue });
+        }
+
+        // View Orders function
+        function viewOrders() {
+            const orders = JSON.parse(localStorage.getItem('restaurantOrders') || '[]');
+            
+            if (orders.length === 0) {
+                showPopup('info', 'No Orders', 'No orders have been placed yet.');
+                return;
+            }
+            
+            let ordersList = '<div style="max-height: 400px; overflow-y: auto; text-align: left;">';
+            ordersList += '<h3 style="margin-bottom: 15px;">Recent Orders</h3>';
+            
+            orders.slice(0, 10).forEach(order => {
+                const itemsList = order.items.map(item => 
+                    `${item.name} x${item.quantity} (${item.price})`
+                ).join('<br>');
+                
+                ordersList += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 10px;">
+                        <strong>Order ${order.id}</strong><br>
+                        <small style="color: rgba(255,255,255,0.6);">${order.date}</small><br>
+                        <div style="margin: 10px 0; font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                            ${itemsList}
+                        </div>
+                        <strong style="color: #d4af37;">Total: ₹${order.total.toLocaleString('en-IN')}</strong>
+                        <span style="float: right; color: #10b981;">● ${order.status}</span>
+                    </div>
+                `;
+            });
+            
+            ordersList += '</div>';
+            showPopup('info', 'Food Orders', ordersList);
+            
+            // Reset orders badge after viewing
+            resetOrdersBadge();
+        }
+
+        // View Reservations function
+        function viewReservations() {
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            
+            if (bookings.length === 0) {
+                showPopup('info', 'No Reservations', 'No table reservations have been made yet.');
+                return;
+            }
+            
+            let bookingsList = '<div style="max-height: 50vh; overflow-y: auto; text-align: left;">';
+            bookingsList += '<h3 style="margin-bottom: 15px;">Table Reservations</h3>';
+            
+            bookings.forEach((booking, index) => {
+                // Determine status color and icon
+                let statusColor, statusIcon, statusBg;
+                if (booking.status === 'confirmed') {
+                    statusColor = '#10b981';
+                    statusIcon = '✓';
+                    statusBg = 'rgba(16,185,129,0.15)';
+                } else if (booking.status === 'rejected') {
+                    statusColor = '#ef4444';
+                    statusIcon = '✕';
+                    statusBg = 'rgba(239,68,68,0.15)';
+                } else {
+                    statusColor = '#f59e0b';
+                    statusIcon = '⏱';
+                    statusBg = 'rgba(245,158,11,0.15)';
+                }
+                
+                bookingsList += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 10px; border-left: 4px solid ${statusColor};">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 1.1rem;">${booking.name}</strong>
+                                <div style="margin: 8px 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                                    <div>📅 ${booking.date} at ${booking.time}</div>
+                                    <div>👥 ${booking.guests} guests</div>
+                                    <div>📧 ${booking.email}</div>
+                                    <div>📞 ${booking.phone || 'N/A'}</div>
+                                    ${booking.requests ? `<div>📝 ${booking.requests}</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="background: ${statusBg}; padding: 8px 16px; border-radius: 8px; color: ${statusColor}; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; white-space: nowrap;">
+                                ${statusIcon} ${booking.status || 'pending'}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${booking.status !== 'confirmed' ? `<button onclick="confirmBooking(${index})" style="padding: 8px 16px; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; color: #10b981; cursor: pointer; font-size: 0.9rem; font-weight: 600;">✓ Confirm</button>` : ''}
+                            ${booking.status !== 'rejected' ? `<button onclick="rejectBooking(${index})" style="padding: 8px 16px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; color: #ef4444; cursor: pointer; font-size: 0.9rem; font-weight: 600;">✕ Reject</button>` : ''}
+                            <button onclick="deleteBooking(${index})" style="padding: 8px 16px; background: rgba(100,100,100,0.2); border: 1px solid rgba(150,150,150,0.4); border-radius: 8px; color: #999; cursor: pointer; font-size: 0.9rem; font-weight: 600;">🗑 Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            bookingsList += '</div>';
+            showPopup('info', 'Table Reservations', bookingsList);
+            
+            // Update bookings badge (will recalculate pending count)
+            updateBookingsBadge();
+        }
+
+        // Confirm booking
+        async function confirmBooking(index) {
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            if (bookings[index]) {
+                const booking = bookings[index];
+                booking.status = 'confirmed';
+                
+                // Update localStorage
+                localStorage.setItem('restaurantBookings', JSON.stringify(bookings));
+                
+                // Update Firebase if available
+                try {
+                    if (window.firebaseReady && booking.firebaseId) {
+                        const docRef = window.firebaseDoc(window.firebaseDB, 'bookings', booking.firebaseId);
+                        await window.firebaseUpdateDoc(docRef, {
+                            status: 'confirmed',
+                            confirmedAt: window.firebaseTimestamp()
+                        });
+                        console.log('✅ Booking confirmed in Firebase');
+                    }
+                } catch (error) {
+                    console.error('Firebase update error:', error);
+                }
+                
+                showPopup('success', 'Booking Confirmed!', `Reservation for ${booking.name} has been confirmed.`);
+                setTimeout(() => {
+                    viewReservations();
+                    updateBookingsBadge(); // Update badge count
+                }, 1500);
+            }
+        }
+
+        // Reject booking
+        async function rejectBooking(index) {
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            if (bookings[index]) {
+                const booking = bookings[index];
+                booking.status = 'rejected';
+                
+                // Update localStorage
+                localStorage.setItem('restaurantBookings', JSON.stringify(bookings));
+                
+                // Update Firebase if available
+                try {
+                    if (window.firebaseReady && booking.firebaseId) {
+                        const docRef = window.firebaseDoc(window.firebaseDB, 'bookings', booking.firebaseId);
+                        await window.firebaseUpdateDoc(docRef, {
+                            status: 'rejected',
+                            rejectedAt: window.firebaseTimestamp()
+                        });
+                        console.log('✅ Booking rejected in Firebase');
+                    }
+                } catch (error) {
+                    console.error('Firebase update error:', error);
+                }
+                
+                showPopup('warning', 'Booking Rejected', `Reservation for ${booking.name} has been rejected.`);
+                setTimeout(() => {
+                    viewReservations();
+                    updateBookingsBadge(); // Update badge count
+                }, 1500);
+            }
+        }
+
+        // Delete booking
+        async function deleteBooking(index) {
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            if (bookings[index]) {
+                const booking = bookings[index];
+                const name = booking.name;
+                
+                showPopup('warning', 'Confirm Delete', `Are you sure you want to delete the reservation for ${name}?`);
+                
+                // Override button to handle delete
+                document.querySelector('.popup-btn').onclick = async function() {
+                    // Delete from Firebase if available
+                    try {
+                        if (window.firebaseReady && booking.firebaseId) {
+                            const docRef = window.firebaseDoc(window.firebaseDB, 'bookings', booking.firebaseId);
+                            await window.firebaseDeleteDoc(docRef);
+                            console.log('✅ Booking deleted from Firebase');
+                        }
+                    } catch (error) {
+                        console.error('Firebase delete error:', error);
+                    }
+                    
+                    // Delete from localStorage
+                    bookings.splice(index, 1);
+                    localStorage.setItem('restaurantBookings', JSON.stringify(bookings));
+                    
+                    showPopup('success', 'Deleted', 'Reservation deleted successfully.');
+                    setTimeout(() => viewReservations(), 1500);
+                };
+            }
+        }
+
+        // Load data on page load
+        loadDashboardData();
+        updateBadges(); // Update notification badges
+
+        // NOTIFICATION BADGE FUNCTIONS
+        function updateBadges() {
+            updateOrdersBadge();
+            updateBookingsBadge();
+        }
+
+        function updateOrdersBadge() {
+            const orders = JSON.parse(localStorage.getItem('restaurantOrders') || '[]');
+            const lastView = parseInt(localStorage.getItem('lastOrdersView') || '0');
+            
+            const newOrders = orders.filter(order => order.timestamp > lastView).length;
+            
+            const badge = document.getElementById('ordersBadge');
+            if (newOrders > 0) {
+                badge.textContent = newOrders;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function updateBookingsBadge() {
+            const bookings = JSON.parse(localStorage.getItem('restaurantBookings') || '[]');
+            const pendingCount = bookings.filter(b => b.status === 'pending' || !b.status).length;
+            
+            const badge = document.getElementById('bookingsBadge');
+            if (pendingCount > 0) {
+                badge.textContent = pendingCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function resetOrdersBadge() {
+            localStorage.setItem('lastOrdersView', Date.now().toString());
+            updateOrdersBadge();
+        }
+
+        // MENU MANAGEMENT FUNCTIONS
+        function openMenuManagement() {
+            const menuHTML = `
+                <div style="max-height: 50vh; overflow-y: auto; text-align: left;">
+                    <h3 style="margin-bottom: 20px; text-align: center;">Menu Management</h3>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button onclick="addNewMenuItem()" style="padding: 12px 24px; background: linear-gradient(135deg, #10b981, #34d399); border: none; border-radius: 10px; color: #fff; font-weight: 600; cursor: pointer;">+ Add New Item</button>
+                    </div>
+                    <div id="menuItemsList"></div>
+                </div>
+            `;
+            showPopup('info', 'Menu Management', menuHTML);
+            displayMenuItems();
+        }
+
+        function displayMenuItems() {
+            const menuItems = getMenuItems();
+            const container = document.getElementById('menuItemsList');
+            
+            if (!container) return;
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">';
+            menuItems.forEach((item, index) => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            ${item.img ? `<img src="${item.img}" alt="${item.name}" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px;">` : ''}
+                            <div>
+                                <strong style="font-size: 1.1rem; color: #d4af37; display: block; margin-bottom: 8px;">${item.name}</strong>
+                                <div style="margin-bottom: 10px; color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.4;">${item.desc}</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                                    <span style="background: rgba(212,175,55,0.2); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; color: #d4af37; white-space: nowrap;">${item.price}</span>
+                                    <span style="background: rgba(16,185,129,0.2); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; color: #10b981; white-space: nowrap;">${item.category}</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <button onclick="editMenuItem(${index})" style="padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); border-radius: 8px; color: #60a5fa; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Edit</button>
+                                <button onclick="deleteMenuItem(${index})" style="padding: 10px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; color: #ef4444; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html || '<p style="text-align: center; color: rgba(255,255,255,0.5);">No menu items found</p>';
+        }
+
+        function getMenuItems() {
+            // Try to get from localStorage first, otherwise use default items
+            const stored = localStorage.getItem('restaurantMenu');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            
+            // Default menu items
+            const defaultMenu = [
+                { id: 1, name: "Truffle Mushroom Pasta", price: "₹10", category: "veg", img: "https://images.unsplash.com/photo-1626844131082-256783844137?q=80&w=1935&auto=format&fit=crop", desc: "Creamy truffle sauce, wild mushrooms, parmesan." },
+                { id: 2, name: "Grilled Salmon", price: "₹1,999", category: "non-veg", img: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", desc: "Fresh atlantic salmon, asparagus, lemon butter." },
+                { id: 3, name: "Classic Steak", price: "₹2,499", category: "non-veg", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2070&auto=format&fit=crop", desc: "Ribeye cooked to perfection with garlic herbs." },
+                { id: 4, name: "Paneer Tikka", price: "₹1,299", category: "veg", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=2034&auto=format&fit=crop", desc: "Spiced cottage cheese, charcoal grilled." },
+                { id: 5, name: "Molten Lava Cake", price: "₹999", category: "dessert", img: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", desc: "Warm chocolate cake with vanilla bean ice cream." },
+                { id: 6, name: "Mojito Supreme", price: "₹799", category: "drinks", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=1887&auto=format&fit=crop", desc: "Fresh mint, lime, rum, sparkling soda." }
+            ];
+            
+            localStorage.setItem('restaurantMenu', JSON.stringify(defaultMenu));
+            return defaultMenu;
+        }
+
+        function saveMenuItems(items) {
+            localStorage.setItem('restaurantMenu', JSON.stringify(items));
+            console.log('✅ Menu saved to localStorage');
+        }
+
+        function addNewMenuItem() {
+            const formHTML = `
+                <div style="text-align: left; max-height: 450px; overflow-y: auto;">
+                    <h3 style="margin-bottom: 20px; text-align: center;">Add New Menu Item</h3>
+                    <form id="addMenuForm" onsubmit="saveNewMenuItem(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Dish Name *</label>
+                            <input type="text" id="dishName" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="e.g., Butter Chicken">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Price *</label>
+                            <input type="text" id="dishPrice" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="e.g., ₹599">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Category *</label>
+                            <select id="dishCategory" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;">
+                                <option value="veg">Vegetarian</option>
+                                <option value="non-veg">Non-Vegetarian</option>
+                                <option value="dessert">Dessert</option>
+                                <option value="drinks">Drinks</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Description *</label>
+                            <textarea id="dishDesc" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box; min-height: 80px; resize: vertical;" placeholder="Describe the dish..."></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Image URL (optional)</label>
+                            <input type="url" id="dishImg" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #10b981, #34d399); border: none; border-radius: 10px; color: #fff; font-weight: 600; cursor: pointer;">Add Item</button>
+                            <button type="button" onclick="openMenuManagement()" style="flex: 1; padding: 14px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; color: #ef4444; font-weight: 600; cursor: pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            showPopup('info', 'Add Menu Item', formHTML);
+        }
+
+        function saveNewMenuItem(e) {
+            e.preventDefault();
+            const items = getMenuItems();
+            
+            const newItem = {
+                id: items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1,
+                name: document.getElementById('dishName').value,
+                price: document.getElementById('dishPrice').value,
+                category: document.getElementById('dishCategory').value,
+                desc: document.getElementById('dishDesc').value,
+                img: document.getElementById('dishImg').value.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60'
+            };
+            
+            items.push(newItem);
+            saveMenuItems(items);
+            window.dispatchEvent(new Event('menuUpdated')); // Trigger website update
+            
+            showPopup('success', 'Item Added!', 'New menu item added successfully. It will appear on the website.');
+            setTimeout(() => openMenuManagement(), 1500);
+        }
+
+        function editMenuItem(index) {
+            const items = getMenuItems();
+            const item = items[index];
+            
+            const formHTML = `
+                <div style="text-align: left; max-height: 450px; overflow-y: auto;">
+                    <h3 style="margin-bottom: 20px; text-align: center;">Edit Menu Item</h3>
+                    <form id="editMenuForm" onsubmit="updateMenuItem(event, ${index})" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Dish Name *</label>
+                            <input type="text" id="editDishName" value="${item.name}" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Price *</label>
+                            <input type="text" id="editDishPrice" value="${item.price}" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Category *</label>
+                            <select id="editDishCategory" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;">
+                                <option value="veg" ${item.category === 'veg' ? 'selected' : ''}>Vegetarian</option>
+                                <option value="non-veg" ${item.category === 'non-veg' ? 'selected' : ''}>Non-Vegetarian</option>
+                                <option value="dessert" ${item.category === 'dessert' ? 'selected' : ''}>Dessert</option>
+                                <option value="drinks" ${item.category === 'drinks' ? 'selected' : ''}>Drinks</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Description *</label>
+                            <textarea id="editDishDesc" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box; min-height: 80px; resize: vertical;">${item.desc}</textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; color: rgba(255,255,255,0.8);">Image URL</label>
+                            <input type="url" id="editDishImg" value="${item.img}" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box;">
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #3b82f6, #60a5fa); border: none; border-radius: 10px; color: #fff; font-weight: 600; cursor: pointer;">Update Item</button>
+                            <button type="button" onclick="openMenuManagement()" style="flex: 1; padding: 14px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; color: #ef4444; font-weight: 600; cursor: pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            showPopup('info', 'Edit Menu Item', formHTML);
+        }
+
+        function updateMenuItem(e, index) {
+            e.preventDefault();
+            const items = getMenuItems();
+            
+            items[index] = {
+                ...items[index],
+                name: document.getElementById('editDishName').value,
+                price: document.getElementById('editDishPrice').value,
+                category: document.getElementById('editDishCategory').value,
+                desc: document.getElementById('editDishDesc').value,
+                img: document.getElementById('editDishImg').value.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60'
+            };
+            
+            saveMenuItems(items);
+            window.dispatchEvent(new Event('menuUpdated')); // Trigger website update
+            
+            showPopup('success', 'Changes Saved!', 'Menu item updated successfully. Changes will appear on the website.');
+            setTimeout(() => openMenuManagement(), 1500);
+        }
+
+        function deleteMenuItem(index) {
+            const items = getMenuItems();
+            const itemName = items[index].name;
+            
+            showPopup('warning', 'Confirm Delete', `Are you sure you want to delete "${itemName}"?`);
+            
+            // Override button to handle delete
+            document.querySelector('.popup-btn').onclick = function() {
+                items.splice(index, 1);
+                saveMenuItems(items);
+                showPopup('success', 'Deleted', 'Menu item deleted successfully!');
+                setTimeout(() => openMenuManagement(), 1000);
+            };
+        }
+
+        // Custom popup function
+        function showPopup(type, title, message) {
+            const overlay = document.getElementById('popupOverlay');
+            const modal = document.getElementById('popupModal');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+
+            titleEl.textContent = title;
+            messageEl.innerHTML = message; // Use innerHTML to support HTML content
+
+            modal.className = 'popup-modal ' + type;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            icon.textContent = icons[type] || icons.info;
+
+            overlay.classList.add('active');
+        }
+
+        function closePopup() {
+            document.getElementById('popupOverlay').classList.remove('active');
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // Logout handler
+        function handleLogout() {
+            showPopup('warning', 'Confirm Logout', 'Are you sure you want to logout?');
+            
+            // Override close button to handle logout
+            document.querySelector('.popup-btn').onclick = function() {
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('adminUsername');
+                window.location.href = 'index.html';
+            };
+        }
+    </script>
+    <!-- Firebase SDK (Firestore Only) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD...", // Using placeholder/existing from index.html if known, or just the structure
+            authDomain: "urban-hub-e7b29.firebaseapp.com",
+            projectId: "urban-hub-e7b29",
+            storageBucket: "urban-hub-e7b29.appspot.com",
+            messagingSenderId: "367176461877",
+            appId: "1:367176461877:web:757367ce90e756143c75ab"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Make Firebase functions available globally
+        window.firebaseDB = db;
+        window.firebaseDoc = doc;
+        window.firebaseUpdateDoc = updateDoc;
+        window.firebaseDeleteDoc = deleteDoc;
+        window.firebaseTimestamp = serverTimestamp;
+        window.firebaseReady = true;
+        
+        console.log('🔥 Admin Panel Firebase initialized (Firestore Only)!');
+    </script>
+</body>
+</html>
