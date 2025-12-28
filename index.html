@@ -3239,6 +3239,70 @@
                 flex-wrap: wrap !important;
             }
         }
+        
+        /* Mobile friendly date/time placeholders */
+        input[type="date"]:required:invalid::-webkit-datetime-edit,
+        input[type="time"]:required:invalid::-webkit-datetime-edit {
+            color: transparent;
+        }
+        input[type="date"]:required:invalid::-webkit-datetime-edit:before,
+        input[type="time"]:required:invalid::-webkit-datetime-edit:before {
+            content: attr(data-placeholder) !important;
+            color: #999;
+        }
+
+        /* Fallback/Standard method for other browsers */
+        input[type="date"]:required:invalid::before,
+        input[type="time"]:required:invalid::before {
+            content: attr(data-placeholder);
+            width: 100%;
+            color: #999;
+        }
+
+        input[type="date"]:valid::before,
+        input[type="time"]:valid::before {
+            display: none;
+        }
+
+        /* Voice Search Tooltip */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .voice-tooltip {
+            position: absolute;
+            top: 115%;
+            right: 0;
+            background: var(--primary);
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            pointer-events: none; /* Let clicks pass through if it overlaps */
+        }
+
+        .voice-tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            right: 15px;
+            border: 6px solid transparent;
+            border-bottom-color: var(--primary);
+        }
+
+        .voice-tooltip.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
     </style>
     
     <!-- Firebase SDK -->
@@ -3329,7 +3393,8 @@
             <div class="search-wrapper">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
                 <input id="siteSearch" type="search" placeholder="Search menu, dishes or price..." aria-label="Search site">
-                <button id="voiceBtn" title="Voice search"><i class="fas fa-microphone"></i></button>
+                <button id="voiceBtn"><i class="fas fa-microphone"></i></button>
+                <div class="voice-tooltip" id="voiceTooltip">Say to Order</div>
             </div>
 
             <ul class="nav-links" id="navLinks">
@@ -3857,11 +3922,13 @@
                 <div class="form-group">
                     <input type="tel" class="form-control" id="bookingPhone" placeholder="Phone Number" required>
                 </div>
-                <div class="form-group">
-                    <input type="date" class="form-control" id="bookingDate" required>
-                </div>
-                <div class="form-group">
-                    <input type="time" class="form-control" id="bookingTime" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="date" class="form-control" id="bookingDate" required data-placeholder="Date">
+                    </div>
+                    <div class="form-group">
+                        <input type="time" class="form-control" id="bookingTime" required data-placeholder="Time">
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="number" class="form-control" id="bookingGuests" placeholder="Number of Guests" min="1" max="20" required>
@@ -4299,6 +4366,22 @@
                     showNotification('Voice search not supported in this browser.');
                 });
             } else {
+                // Tooltip logic
+                const tooltip = document.getElementById('voiceTooltip');
+                if (tooltip) {
+                    // Show on load (discovery)
+                    setTimeout(() => {
+                        tooltip.classList.add('active');
+                        setTimeout(() => {
+                            tooltip.classList.remove('active');
+                        }, 4000);
+                    }, 1000);
+
+                    // Show on hover
+                    voiceBtn.addEventListener('mouseenter', () => tooltip.classList.add('active'));
+                    voiceBtn.addEventListener('mouseleave', () => tooltip.classList.remove('active'));
+                }
+
                 const recognizer = new SpeechRecognition();
                 // Enhanced settings for better accuracy
                 recognizer.continuous = true; // Keep listening continuously
@@ -6156,6 +6239,12 @@
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 
