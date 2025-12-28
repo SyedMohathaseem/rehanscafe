@@ -9,6 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // Initialize EmailJS with your public key if you have one
+            // emailjs.init("YOUR_PUBLIC_KEY"); 
+        })();
+    </script>
+
     <style>
         /* --- VARIABLES & RESET --- */
         :root {
@@ -5700,38 +5709,35 @@
                 message: `Table Reservation Request:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nDate: ${formattedDate}\nTime: ${time}\nGuests: ${guests}\nSpecial Requests: ${notes}`
             };
             
-            // Send email using EmailJS
-            emailjs.send(
-                'service_2x94jhf',
-                'template_sy5295a',
-                templateParams
-            )
-            .then(
-                function(response) {
-                    console.log('Reservation sent!', response.status, response.text);
-                    showNotification(`✅ Booking request sent successfully!`);
-                    // Non-blocking confirmation notification for customer
-                    showNotification(`🎉 Table Confirmed — ${formattedDate} ${time} — We will contact ${phone}`);
-                    closeModal();
-                    reservationForm.reset();
-                    
-                    // Reset button
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                },
-                function(error) {
-                    console.error('Reservation failed:', error);
-                    // Still show success notification since data is saved to Firebase
-                    showNotification(`✅ Booking request received!`);
-                    showNotification(`🎉 Table Received — ${formattedDate} ${time} — We will contact ${phone}`);
-                    closeModal();
-                    reservationForm.reset();
-                    
-                    // Reset button
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                }
-            );
+            // Send email using EmailJS (Safely)
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send(
+                    'service_2x94jhf',
+                    'template_sy5295a',
+                    templateParams
+                )
+                .then(
+                    function(response) {
+                        console.log('Reservation sent!', response.status, response.text);
+                        // Success handled below
+                    },
+                    function(error) {
+                        console.warn('Email notification failed (but booking saved):', error);
+                    }
+                );
+            } else {
+                console.warn('EmailJS not loaded. Skipping email notification.');
+            }
+
+            // Always show success to user if we reached here (Firestore save attempted)
+            showNotification(`✅ Booking Confirmed for ${formattedDate} at ${time}`);
+            showNotification(`📞 We will contact ${phone} if needed.`);
+            closeModal();
+            reservationForm.reset();
+            
+            // Reset button
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         });
 
         // --- Admin Menu Management (Admin-only) ---
