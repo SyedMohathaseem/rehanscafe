@@ -4511,6 +4511,8 @@
                                         isListening = false;
                                         voiceBtn.classList.remove('listening');
                                         searchInput.placeholder = 'Search menu, dishes or price...';
+                                        searchInput.value = ''; // Clear input after successful order
+                                        searchMenu(''); // Reset menu results
                                     } else {
                                         showNotification(`❌ Could not find "${itemPhrase}" on the menu.`);
                                     }
