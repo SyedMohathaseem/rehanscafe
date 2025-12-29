@@ -4404,18 +4404,17 @@
                 }
 
                 const recognizer = new SpeechRecognition();
-                // Enhanced settings for better accuracy
-                recognizer.continuous = true; // Keep listening continuously
-                recognizer.interimResults = true; // Show real-time results
-                recognizer.maxAlternatives = 3; // Get multiple alternatives for better understanding
-                recognizer.lang = 'en-IN'; // Indian English
+                // Optimization: Disable continuous mode for faster, single-shot commands
+                recognizer.continuous = false; 
+                recognizer.interimResults = true; 
+                recognizer.maxAlternatives = 1;
+                recognizer.lang = 'en-IN'; 
 
-                let interimText = '';
                 let isListening = false;
 
                 voiceBtn.addEventListener('click', () => {
                     if (isListening) {
-                        recognizer.stop();
+                        try { recognizer.stop(); } catch(e){}
                         isListening = false;
                         voiceBtn.classList.remove('listening');
                         searchInput.placeholder = 'Search menu, dishes or price...';
@@ -4423,7 +4422,6 @@
                     }
                     
                     try {
-                        interimText = '';
                         searchInput.value = '';
                         searchInput.placeholder = '🎤 Listening... Speak now';
                         recognizer.start();
@@ -4432,93 +4430,105 @@
                     } catch (e) {
                         console.error('Recognition start error:', e);
                         searchInput.placeholder = 'Search menu, dishes or price...';
+                        isListening = false;
+                        voiceBtn.classList.remove('listening');
                     }
                 });
 
                 recognizer.addEventListener('result', (ev) => {
-                    // Get best result with improved accuracy
-                    const results = ev.results;
-                    let transcript = '';
-                    
-                    for (let i = 0; i < results.length; i++) {
-                        transcript += results[i][0].transcript;
-                    }
-                    
-                    interimText = transcript;
-                    // Show real-time transcript in search box
+                    const transcript = Array.from(ev.results)
+                        .map(result => result[0].transcript)
+                        .join('');
+
                     if (searchInput) {
-                        searchInput.value = interimText;
-                        searchInput.placeholder = '🎤 Listening...';
+                        searchInput.value = transcript;
                     }
                     
-                    if (ev.results[ev.results.length - 1].isFinal) {
+                    // On final result, process immediately
+                    if (ev.results[0].isFinal) {
                         const finalText = transcript.trim();
                         console.log('🎤 Voice recognized:', finalText);
                         
-                        // Run search with recognized text
+                        // Run search
                         if (finalText.length > 0) {
                             searchMenu(finalText);
                         }
 
-                        // Command parsing: look for "order" commands
-                        try {
-                            const text = finalText.toLowerCase();
-                            // Enhanced command recognition patterns
-                            const orderMatch = text.match(/(?:order|add|get|i want|give me)\s+(?:now\s*)?(.+?)(?:\s+(?:please|thanks|thank you))?$/i) 
-                                            || text.match(/i (?:want to|would like to) order\s+(.+)/i);
-                            if (orderMatch && orderMatch[1]) {
-                                const itemPhrase = orderMatch[1]
-                                    .replace(/\b(?:now|please|thanks|thank you|one|a|an|the)\b/gi, '')
-                                    .trim();
-                                    
-                                if (itemPhrase.length > 0) {
-                                    // Improved fuzzy matching with scoring
-                                    const normalized = itemPhrase.toLowerCase().replace(/[^a-z0-9 ]/g, '');
-                                    let found = null;
-                                    let bestMatch = 0;
-                                    
-                                    // Score-based matching for better accuracy
-                                    for (const item of menuItems) {
-                                        const itemName = item.name.toLowerCase();
-                                        const itemDesc = (item.desc || '').toLowerCase();
-                                        
-                                        let score = 0;
-                                        if (itemName === normalized) score = 100; // Exact match
-                                        else if (itemName.includes(normalized)) score = 80; // Contains phrase
-                                        else {
-                                            // Word-by-word matching
-                                            const words = normalized.split(' ');
-                                            const matchedWords = words.filter(w => 
-                                                itemName.includes(w) || itemDesc.includes(w)
-                                            );
-                                            score = (matchedWords.length / words.length) * 60;
-                                        }
-                                        
-                                        if (score > bestMatch) {
-                                            bestMatch = score;
-                                            found = item;
-                                        }
-                                    }
-
-                                    if (found && bestMatch > 40) {
-                                        addToCart(found);
-                                        showNotification(`✅ Added "${found.name}" to cart!`);
-                                        try { toggleCart(); } catch(e){}
-                                        try { incrementNotificationBadge(1); } catch(e){}
-                                        
-                                        // Stop voice listening after adding to cart
-                                        recognizer.stop();
-                                        isListening = false;
-                                        voiceBtn.classList.remove('listening');
-                                        searchInput.placeholder = 'Search menu, dishes or price...';
-                                    } else {
-                                        showNotification(`❌ Could not find "${itemPhrase}" on the menu.`);
-                                    }
-                                }
-                            }
-                        } catch (e) { console.warn('Voice command handling error', e); }
+                        // Process "Order" commands
+                        processVoiceCommand(finalText);
+                        
+                        // Reset UI
+                        isListening = false;
+                        voiceBtn.classList.remove('listening');
+                        searchInput.placeholder = 'Search menu, dishes or price...';
                     }
                 });
+
+                recognizer.addEventListener('end', () => {
+                    if (isListening) {
+                        isListening = false;
+                        voiceBtn.classList.remove('listening');
+                        searchInput.placeholder = 'Search menu, dishes or price...';
+                    }
+                });
+
+                recognizer.addEventListener('error', (err) => {
+                    console.error('Voice recognition error:', err.error);
+                    isListening = false;
+                    voiceBtn.classList.remove('listening');
+                    searchInput.placeholder = 'Search menu, dishes or price...';
+                    
+                    if (err.error !== 'aborted' && err.error !== 'no-speech') {
+                         showNotification('Voice input failed. Please try again.');
+                    }
+                });
+                
+                function processVoiceCommand(text) {
+                    try {
+                        const lowerText = text.toLowerCase();
+                        // Enhanced command recognition patterns
+                        const orderMatch = lowerText.match(/(?:order|add|get|i want|give me)\s+(?:now\s*)?(.+?)(?:\s+(?:please|thanks|thank you))?$/i) 
+                                        || lowerText.match(/i (?:want to|would like to) order\s+(.+)/i);
+                                        
+                        if (orderMatch && orderMatch[1]) {
+                            const itemPhrase = orderMatch[1]
+                                .replace(/\b(?:now|please|thanks|thank you|one|a|an|the)\b/gi, '')
+                                .trim();
+                                
+                            if (itemPhrase.length > 0) {
+                                // Improved fuzzy matching with scoring
+                                const normalized = itemPhrase.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+                                let found = null;
+                                let bestMatch = 0;
+                                
+                                for (const item of menuItems) {
+                                    const itemName = item.name.toLowerCase();
+                                    let score = 0;
+                                    if (itemName === normalized) score = 100;
+                                    else if (itemName.includes(normalized)) score = 80;
+                                    else {
+                                        const words = normalized.split(' ');
+                                        const matchedWords = words.filter(w => itemName.includes(w));
+                                        score = (matchedWords.length / words.length) * 60;
+                                    }
+                                    
+                                    if (score > bestMatch) {
+                                        bestMatch = score;
+                                        found = item;
+                                    }
+                                }
+
+                                if (found && bestMatch > 40) {
+                                    addToCart(found);
+                                    showNotification(`✅ Added "${found.name}" to cart!`);
+                                    try { toggleCart(); } catch(e){}
+                                } else {
+                                    showNotification(`❌ Could not find "${itemPhrase}" on the menu.`);
+                                }
+                            }
+                        }
+                    } catch (e) { console.warn('Command processing error', e); }
+                }
 
                 recognizer.addEventListener('end', () => {
                     isListening = false;
