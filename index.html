@@ -4511,8 +4511,14 @@
                                         isListening = false;
                                         voiceBtn.classList.remove('listening');
                                         searchInput.placeholder = 'Search menu, dishes or price...';
-                                        searchInput.value = ''; // Clear input after successful order
-                                        searchMenu(''); // Reset menu results
+                                        
+                                        // Force UI update after a short delay to prevent race conditions
+                                        setTimeout(() => {
+                                            interimText = ''; // Clear internal buffer
+                                            searchInput.value = ''; // Clear input
+                                            searchMenu(''); // Reset menu results to show all
+                                            console.log('✅ Search input cleared and menu reset');
+                                        }, 400);
                                     } else {
                                         showNotification(`❌ Could not find "${itemPhrase}" on the menu.`);
                                     }
