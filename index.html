@@ -4854,7 +4854,7 @@
                         const itemsList = cart.map(i => `${i.name} x${i.quantity}`).join(', ');
                         
                         // Call backend API to send email with PDF invoice
-                        fetch('http://localhost:3001/send-invoice', {
+                        fetch('https://rehans-invoice-server.onrender.com/send-invoice', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
