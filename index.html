@@ -4823,32 +4823,35 @@
                 // Award loyalty points
                 updateLoyaltyPoints(total);
                 
-                // Send order confirmation email to customer (if provided)
+                // Send order confirmation email to customer
                 try {
                     const savedCustomerEmail = localStorage.getItem('customerEmail');
-                    const customerEmail = savedCustomerEmail || window.prompt('Enter your email to receive the order confirmation receipt:', '');
-                    if (customerEmail) {
+                    const customerName = localStorage.getItem('customerName') || 'Valued Customer';
+                    
+                    // If logged in, auto-send. Otherwise, skip (don't prompt)
+                    if (savedCustomerEmail) {
                         const orderItems = cart.map(i => `${i.name} x${i.quantity} - ${i.price}`).join('\n');
                         const orderTemplate = {
-                            to_email: customerEmail,
+                            to_email: savedCustomerEmail,
+                            to_name: customerName,
                             from_name: "REHAN'S Multi Cuisine Restaurants",
                             from_email: 'no-reply@rehans.example',
                             order_id: orderId,
                             order_total: `₹${total.toLocaleString('en-IN')}`,
                             order_items: orderItems,
-                            reply_to: customerEmail,
-                            message: `Thank you for your order!\n\nOrder ID: ${orderId}\nTotal: ₹${total.toLocaleString('en-IN')}\n\nItems:\n${orderItems}`
+                            reply_to: savedCustomerEmail,
+                            message: `Dear ${customerName},\n\nThank you for your order!\n\nOrder ID: ${orderId}\nTotal: ₹${total.toLocaleString('en-IN')}\n\nItems Ordered:\n${orderItems}\n\nYour order will be prepared shortly.\n\nThank you for choosing REHAN'S!`
                         };
 
                         emailjs.send('service_2x94jhf', 'template_sy5295a', orderTemplate)
                         .then(function(response) {
                             console.log('Order confirmation email sent', response.status, response.text);
-                            showNotification('📧 Order confirmation sent to your email');
-                            // Optionally store customer email for future
-                            try { localStorage.setItem('customerEmail', customerEmail); } catch(e){}
+                            showNotification(`📧 Order confirmation sent to ${savedCustomerEmail}`);
                         }, function(error) {
                             console.error('Order confirmation email failed:', error);
                         });
+                    } else {
+                        console.log('No customer email saved - skipping email notification');
                     }
                 } catch (e) {
                     console.error('Error sending order confirmation:', e);
@@ -5568,6 +5571,50 @@
                     showNotification('❌ Invalid password!');
                     document.getElementById('adminPassword').value = '';
                 }
+            });
+        }
+
+        // Customer signup form handler - saves email for order confirmations
+        const customerSignupForm = document.getElementById('customerSignupForm');
+        if (customerSignupForm) {
+            customerSignupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                
+                // Save customer details to localStorage
+                localStorage.setItem('customerEmail', email);
+                localStorage.setItem('customerName', name);
+                localStorage.setItem('customerLoggedIn', 'true');
+                
+                showNotification(`✅ Account created! Welcome, ${name}!`);
+                closeCustomerModal();
+                
+                // Update UI to show logged in state
+                try {
+                    const loginBtn = document.querySelector('.nav-links .login-btn');
+                    if (loginBtn) {
+                        loginBtn.innerHTML = `<i class="fas fa-user"></i> ${name.split(' ')[0]}`;
+                    }
+                } catch(e) {}
+            });
+        }
+
+        // Customer login form handler
+        const customerLoginForm = document.getElementById('customerLoginForm');
+        if (customerLoginForm) {
+            customerLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('customerEmail').value;
+                const password = document.getElementById('customerPassword').value;
+                
+                // Save customer email to localStorage for order confirmations
+                localStorage.setItem('customerEmail', email);
+                localStorage.setItem('customerLoggedIn', 'true');
+                
+                showNotification(`✅ Welcome back!`);
+                closeCustomerModal();
             });
         }
 
