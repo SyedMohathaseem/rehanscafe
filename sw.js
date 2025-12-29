@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rehans-app-v2';
+const CACHE_NAME = 'rehans-app-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
 
 // Install Service Worker
 self.addEventListener('install', (e) => {
+  self.skipWaiting(); // Force immediate activation
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
         return cache.addAll(ASSETS);
