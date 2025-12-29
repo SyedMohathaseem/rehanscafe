@@ -4756,6 +4756,7 @@
 
         async function confirmPayment() {
             closeUpiModal();
+            window.orderInProgress = true; // Flag to distinguish from manual removal
             
             const total = currentPaymentAmount;
             const orderId = '#RC' + Date.now().toString().slice(-6);
@@ -6700,8 +6701,8 @@
                     }
                 }
                 
-                // Detect order placement (cart cleared)
-                if (current === 0 && lastCart > 0) {
+                // Detect order placement (cart cleared AND actual checkout in progress)
+                if (current === 0 && lastCart > 0 && window.orderInProgress) {
                     console.log('Order detected! Last cart:', lastCart, 'Saved items:', savedCartItems);
                     
                     if (savedCartItems.length > 0) {
@@ -6731,6 +6732,7 @@
                             `Your order for ${lastCart} items has been placed successfully.`);
                     }
                     savedCartItems = [];
+                    window.orderInProgress = false; // Reset flag after notification
                 }
                 lastCart = current;
             }
