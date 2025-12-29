@@ -4594,8 +4594,12 @@
         }
 
         function removeFromCart(itemId) {
+            const removedItem = cart.find(item => item.id === itemId);
             cart = cart.filter(item => item.id !== itemId);
             updateCart();
+            if (removedItem) {
+                showNotification(`${removedItem.name} removed from cart!`);
+            }
         }
 
         function updateQuantity(itemId, change) {
