@@ -4849,10 +4849,40 @@
                     customerOrders.unshift(orderRecord);
                     localStorage.setItem('customerOrderHistory', JSON.stringify(customerOrders));
                     
-                    // Show detailed confirmation notification
+                    // Send order confirmation email via backend API
                     if (savedCustomerEmail) {
                         const itemsList = cart.map(i => `${i.name} x${i.quantity}`).join(', ');
-                        showNotification(`📧 Order confirmation saved! Details sent to ${savedCustomerEmail}`);
+                        
+                        // Call backend API to send email with PDF invoice
+                        fetch('http://localhost:3001/send-invoice', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: savedCustomerEmail,
+                                name: customerName,
+                                orderId: orderId,
+                                items: cart.map(i => ({
+                                    name: i.name,
+                                    qty: i.quantity,
+                                    price: parseFloat(i.price.replace(/[^\d.]/g, ''))
+                                })),
+                                totalAmount: total
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification(`📧 Order confirmation email sent to ${savedCustomerEmail}`);
+                                console.log('Email sent successfully:', data);
+                            } else {
+                                showNotification(`📧 Order confirmed! Email notification saved for ${savedCustomerEmail}`);
+                                console.log('Email API response:', data);
+                            }
+                        })
+                        .catch(err => {
+                            console.log('Backend not available, order saved locally');
+                            showNotification(`✅ Order ${orderId} confirmed! Details saved to your account.`);
+                        });
                         
                         // Create detailed confirmation in notification panel
                         try {
@@ -4862,7 +4892,7 @@
                             );
                         } catch(e) { console.log('Notification panel not available'); }
                         
-                        console.log('✅ Order saved to customer history:', orderRecord);
+                        console.log('Order saved to customer history:', orderRecord);
                     } else {
                         showNotification(`✅ Order ${orderId} confirmed! Create an account to track your orders.`);
                     }
