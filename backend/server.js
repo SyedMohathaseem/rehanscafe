@@ -12,8 +12,8 @@ app.use(express.json());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.GMAIL_EMAIL || 'your-email@gmail.com',
-        pass: process.env.GMAIL_PASSWORD || 'your-app-password'
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_PASSWORD
     }
 });
 
@@ -103,7 +103,7 @@ app.post('/send-invoice', async (req, res) => {
         const itemsList = items.map(i => i.name + ' x' + (i.qty || i.quantity || 1)).join(', ');
 
         const mailOptions = {
-            from: '"REHAN\'S Multi Cuisine Restaurants" <' + (process.env.GMAIL_EMAIL || 'your-email@gmail.com') + '>',
+            from: '"REHAN\'S Multi Cuisine Restaurants" <' + process.env.GMAIL_EMAIL + '>',
             to: email,
             subject: 'Order Confirmation - ' + orderId,
             html: '<div style="font-family:Arial;max-width:600px;margin:0 auto"><div style="background:#d4af37;padding:20px;text-align:center"><h1 style="color:#000;margin:0">REHAN\'S Multi Cuisine Restaurants</h1></div><div style="padding:30px;background:#f9f9f9"><h2>Thank you for your order, ' + (name || 'Valued Customer') + '!</h2><p>Your order has been received and is being prepared.</p><div style="background:#fff;padding:20px;border-radius:8px;margin:20px 0"><p><strong>Order ID:</strong> ' + orderId + '</p><p><strong>Items:</strong> ' + itemsList + '</p><p><strong>Total:</strong> Rs.' + totalAmount.toLocaleString('en-IN') + '</p></div><p>Please find your invoice attached.</p></div></div>',
