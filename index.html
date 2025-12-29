@@ -4823,38 +4823,51 @@
                 // Award loyalty points
                 updateLoyaltyPoints(total);
                 
-                // Send order confirmation email to customer
+                // Save order to customer's localStorage order history
                 try {
                     const savedCustomerEmail = localStorage.getItem('customerEmail');
                     const customerName = localStorage.getItem('customerName') || 'Valued Customer';
                     
-                    // If logged in, auto-send. Otherwise, skip (don't prompt)
+                    // Create order record for customer history
+                    const orderRecord = {
+                        orderId: orderId,
+                        customerEmail: savedCustomerEmail,
+                        customerName: customerName,
+                        items: cart.map(i => ({
+                            name: i.name,
+                            quantity: i.quantity,
+                            price: i.price
+                        })),
+                        total: total,
+                        date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+                        timestamp: Date.now(),
+                        status: 'Confirmed'
+                    };
+                    
+                    // Save to customer's order history in localStorage
+                    const customerOrders = JSON.parse(localStorage.getItem('customerOrderHistory') || '[]');
+                    customerOrders.unshift(orderRecord);
+                    localStorage.setItem('customerOrderHistory', JSON.stringify(customerOrders));
+                    
+                    // Show detailed confirmation notification
                     if (savedCustomerEmail) {
-                        const orderItems = cart.map(i => `${i.name} x${i.quantity} - ${i.price}`).join('\n');
-                        const orderTemplate = {
-                            to_email: savedCustomerEmail,
-                            to_name: customerName,
-                            from_name: "REHAN'S Multi Cuisine Restaurants",
-                            from_email: 'no-reply@rehans.example',
-                            order_id: orderId,
-                            order_total: `₹${total.toLocaleString('en-IN')}`,
-                            order_items: orderItems,
-                            reply_to: savedCustomerEmail,
-                            message: `Dear ${customerName},\n\nThank you for your order!\n\nOrder ID: ${orderId}\nTotal: ₹${total.toLocaleString('en-IN')}\n\nItems Ordered:\n${orderItems}\n\nYour order will be prepared shortly.\n\nThank you for choosing REHAN'S!`
-                        };
-
-                        emailjs.send('service_2x94jhf', 'template_sy5295a', orderTemplate)
-                        .then(function(response) {
-                            console.log('Order confirmation email sent', response.status, response.text);
-                            showNotification(`📧 Order confirmation sent to ${savedCustomerEmail}`);
-                        }, function(error) {
-                            console.error('Order confirmation email failed:', error);
-                        });
+                        const itemsList = cart.map(i => `${i.name} x${i.quantity}`).join(', ');
+                        showNotification(`📧 Order confirmation saved! Details sent to ${savedCustomerEmail}`);
+                        
+                        // Create detailed confirmation in notification panel
+                        try {
+                            createNotif('order', `Order Confirmed - ${orderId}`, 
+                                `Dear ${customerName}, your order for ₹${total.toLocaleString('en-IN')} has been confirmed. Items: ${itemsList}. Check "My Orders" to view details.`,
+                                { orderId: orderId, email: savedCustomerEmail, total: total }
+                            );
+                        } catch(e) { console.log('Notification panel not available'); }
+                        
+                        console.log('✅ Order saved to customer history:', orderRecord);
                     } else {
-                        console.log('No customer email saved - skipping email notification');
+                        showNotification(`✅ Order ${orderId} confirmed! Create an account to track your orders.`);
                     }
                 } catch (e) {
-                    console.error('Error sending order confirmation:', e);
+                    console.error('Error saving order to history:', e);
                 }
 
                 // Clear cart
