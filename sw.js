@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rehans-app-v1';
+const CACHE_NAME = 'rehans-app-v2';
 const ASSETS = [
   './',
   './index.html',
