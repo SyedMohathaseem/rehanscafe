@@ -36,11 +36,19 @@ app.get('/', (req, res) => {
 });
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // Use TLS (port 587), not SSL (port 465)
     auth: {
         user: process.env.GMAIL_EMAIL,
         pass: process.env.GMAIL_PASSWORD
-    }
+    },
+    tls: {
+        rejectUnauthorized: false // Allow self-signed certs
+    },
+    connectionTimeout: 30000, // 30 seconds
+    greetingTimeout: 15000,
+    socketTimeout: 30000
 });
 
 function generateInvoicePDF(orderData) {
