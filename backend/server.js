@@ -145,7 +145,13 @@ app.post('/send-invoice', async (req, res) => {
         res.json({ success: true, message: 'Invoice sent to ' + email });
     } catch (error) {
         console.error('Email error:', error);
-        res.status(500).json({ success: false, error: 'Failed to send email' });
+        // Return the actual error for debugging
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to send email',
+            details: error.message || 'Unknown error',
+            code: error.code || null
+        });
     }
 });
 
