@@ -1,21 +1,44 @@
 {
   "name": "Rehan's Multi Cuisine Restaurant",
   "short_name": "Rehan's",
+  "description": "Experience authentic multi-cuisine dining at Rehan's. Order delicious food online or reserve your table today!",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#d4af37",
   "orientation": "portrait",
+  "categories": [
+    "food",
+    "restaurant",
+    "dining"
+  ],
   "icons": [
     {
       "src": "rehans.jpeg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "rehans.jpeg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Menu",
+      "short_name": "Menu",
+      "description": "Browse our delicious menu",
+      "url": "./index.html#menu"
+    },
+    {
+      "name": "Book Table",
+      "short_name": "Reserve",
+      "description": "Make a reservation",
+      "url": "./index.html#reservations"
     }
   ]
 }
