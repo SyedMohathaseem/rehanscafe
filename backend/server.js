@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
 
 const app = express();
@@ -10,16 +9,14 @@ const PORT = process.env.PORT || 3001;
 console.log('=== Server Starting ===');
 console.log('Checking environment variables...');
 
-if (!process.env.GMAIL_EMAIL) {
-    console.error('⚠️  WARNING: GMAIL_EMAIL environment variable is NOT set!');
+if (!process.env.RESEND_API_KEY) {
+    console.error('⚠️  WARNING: RESEND_API_KEY environment variable is NOT set!');
 } else {
-    console.log('✓ GMAIL_EMAIL is set:', process.env.GMAIL_EMAIL.substring(0, 3) + '***');
+    console.log('✓ RESEND_API_KEY is set:', process.env.RESEND_API_KEY.substring(0, 8) + '***');
 }
 
-if (!process.env.GMAIL_PASSWORD) {
-    console.error('⚠️  WARNING: GMAIL_PASSWORD environment variable is NOT set!');
-} else {
-    console.log('✓ GMAIL_PASSWORD is set (hidden)');
+if (!process.env.FROM_EMAIL) {
+    console.log('ℹ️  FROM_EMAIL not set, will use default Resend email');
 }
 
 app.use(cors());
@@ -30,25 +27,10 @@ app.get('/', (req, res) => {
     res.json({ 
         status: 'OK', 
         service: "REHAN'S Invoice Server",
-        emailConfigured: !!(process.env.GMAIL_EMAIL && process.env.GMAIL_PASSWORD),
+        emailConfigured: !!process.env.RESEND_API_KEY,
+        emailProvider: 'Resend',
         timestamp: new Date().toISOString() 
     });
-});
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // Use TLS (port 587), not SSL (port 465)
-    auth: {
-        user: process.env.GMAIL_EMAIL,
-        pass: process.env.GMAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false // Allow self-signed certs
-    },
-    connectionTimeout: 30000, // 30 seconds
-    greetingTimeout: 15000,
-    socketTimeout: 30000
 });
 
 function generateInvoicePDF(orderData) {
@@ -122,6 +104,46 @@ function generateInvoicePDF(orderData) {
     });
 }
 
+// Send email using Resend API (HTTP-based, works on Render)
+async function sendEmailWithResend(to, subject, htmlContent, pdfAttachment, orderId) {
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+    
+    if (!RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not configured');
+    }
+
+    // Prepare the email payload
+    const emailPayload = {
+        from: `REHAN'S Multi Cuisine Restaurants <${FROM_EMAIL}>`,
+        to: [to],
+        subject: subject,
+        html: htmlContent,
+        attachments: pdfAttachment ? [{
+            filename: `Invoice-${orderId}.pdf`,
+            content: pdfAttachment.toString('base64')
+        }] : []
+    };
+
+    // Send via Resend API
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(emailPayload)
+    });
+
+    const result = await response.json();
+    
+    if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to send email via Resend');
+    }
+    
+    return result;
+}
+
 app.post('/send-invoice', async (req, res) => {
     const { email, name, orderId, items, totalAmount } = req.body;
 
@@ -136,29 +158,40 @@ app.post('/send-invoice', async (req, res) => {
         const pdfBuffer = await generateInvoicePDF({ email, name, orderId, items, totalAmount });
         const itemsList = items.map(i => i.name + ' x' + (i.qty || i.quantity || 1)).join(', ');
 
-        const mailOptions = {
-            from: '"REHAN\'S Multi Cuisine Restaurants" <' + process.env.GMAIL_EMAIL + '>',
-            to: email,
-            subject: 'Order Confirmation - ' + orderId,
-            html: '<div style="font-family:Arial;max-width:600px;margin:0 auto"><div style="background:#d4af37;padding:20px;text-align:center"><h1 style="color:#000;margin:0">REHAN\'S Multi Cuisine Restaurants</h1></div><div style="padding:30px;background:#f9f9f9"><h2>Thank you for your order, ' + (name || 'Valued Customer') + '!</h2><p>Your order has been received and is being prepared.</p><div style="background:#fff;padding:20px;border-radius:8px;margin:20px 0"><p><strong>Order ID:</strong> ' + orderId + '</p><p><strong>Items:</strong> ' + itemsList + '</p><p><strong>Total:</strong> Rs.' + totalAmount.toLocaleString('en-IN') + '</p></div><p>Please find your invoice attached.</p></div></div>',
-            attachments: [{
-                filename: 'Invoice-' + orderId + '.pdf',
-                content: pdfBuffer,
-                contentType: 'application/pdf'
-            }]
-        };
+        const htmlContent = `
+            <div style="font-family:Arial;max-width:600px;margin:0 auto">
+                <div style="background:#d4af37;padding:20px;text-align:center">
+                    <h1 style="color:#000;margin:0">REHAN'S Multi Cuisine Restaurants</h1>
+                </div>
+                <div style="padding:30px;background:#f9f9f9">
+                    <h2>Thank you for your order, ${name || 'Valued Customer'}!</h2>
+                    <p>Your order has been received and is being prepared.</p>
+                    <div style="background:#fff;padding:20px;border-radius:8px;margin:20px 0">
+                        <p><strong>Order ID:</strong> ${orderId}</p>
+                        <p><strong>Items:</strong> ${itemsList}</p>
+                        <p><strong>Total:</strong> Rs.${totalAmount.toLocaleString('en-IN')}</p>
+                    </div>
+                    <p>Please find your invoice attached.</p>
+                </div>
+            </div>
+        `;
 
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent to:', email);
-        res.json({ success: true, message: 'Invoice sent to ' + email });
+        const result = await sendEmailWithResend(
+            email,
+            'Order Confirmation - ' + orderId,
+            htmlContent,
+            pdfBuffer,
+            orderId
+        );
+
+        console.log('Email sent to:', email, 'Resend ID:', result.id);
+        res.json({ success: true, message: 'Invoice sent to ' + email, emailId: result.id });
     } catch (error) {
         console.error('Email error:', error);
-        // Return the actual error for debugging
         res.status(500).json({ 
             success: false, 
             error: 'Failed to send email',
-            details: error.message || 'Unknown error',
-            code: error.code || null
+            details: error.message || 'Unknown error'
         });
     }
 });
