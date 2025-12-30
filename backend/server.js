@@ -6,8 +6,34 @@ const PDFDocument = require('pdfkit');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Startup validation for environment variables
+console.log('=== Server Starting ===');
+console.log('Checking environment variables...');
+
+if (!process.env.GMAIL_EMAIL) {
+    console.error('⚠️  WARNING: GMAIL_EMAIL environment variable is NOT set!');
+} else {
+    console.log('✓ GMAIL_EMAIL is set:', process.env.GMAIL_EMAIL.substring(0, 3) + '***');
+}
+
+if (!process.env.GMAIL_PASSWORD) {
+    console.error('⚠️  WARNING: GMAIL_PASSWORD environment variable is NOT set!');
+} else {
+    console.log('✓ GMAIL_PASSWORD is set (hidden)');
+}
+
 app.use(cors());
 app.use(express.json());
+
+// Root route for quick health check
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        service: "REHAN'S Invoice Server",
+        emailConfigured: !!(process.env.GMAIL_EMAIL && process.env.GMAIL_PASSWORD),
+        timestamp: new Date().toISOString() 
+    });
+});
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
